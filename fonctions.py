@@ -13,7 +13,7 @@ def get_noms_sommets(n):
 
 # Détermine si un graphe est à coût minimal
 def est_flot_a_cout_min(numero):
-    return numero >= 6
+    return numero >= 6     # pk ???
 
 # ------------------------
 # Affichage Matrice
@@ -242,6 +242,9 @@ def executer_push_relabel(capacites, noms):
     push_relabel(capacites, noms)
 
 
+# ------------------------------
+# Algorithme Bellman
+# ------------------------------
 
-
-##def executer_flot_min_cout(capacites, couts, noms) : 
+def executer_flot_min_cout(capacites, couts, noms) : 
+    
