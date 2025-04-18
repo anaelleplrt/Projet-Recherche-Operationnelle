@@ -1,5 +1,4 @@
 from reader import lire_graphe
-from bellman import calculer_table_bellman
 from collections import deque
 import heapq
 
@@ -13,7 +12,7 @@ def get_noms_sommets(n):
 
 # Détermine si un graphe est à coût minimal
 def est_flot_a_cout_min(numero):
-    return numero >= 6     # pk ???
+    return numero >= 6
 
 # ------------------------
 # Affichage Matrice
@@ -58,8 +57,8 @@ def traiter_graphe(numero):
 
     if est_flot_a_cout_min(numero):
         afficher_matrice("Matrice des coûts", couts, noms)
-        table = calculer_table_bellman(n)
-        afficher_matrice("Table de Bellman (simulation)", table, noms)
+        #table = calculer_table_bellman(n)
+        #afficher_matrice("Table de Bellman (simulation)", table, noms)
         #executer_flot_min_cout(capacites, couts, noms)
     
 
@@ -236,15 +235,25 @@ def push_relabel(capacites, noms):
         iteration += 1
 
     print(f"\n✅ Flot maximum total = {exces[puits]}")
+
+    print("\n★ Affichage du flot max :")
+    matrice_flot = [[0]*n for _ in range(n)]
+    for u in range(n):
+        for v in range(n):
+            if capacites[u][v] > 0:
+                matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
+            else:
+                matrice_flot[u][v] = "0"
+    afficher_matrice("Flot maximum", matrice_flot, noms)
+
     return exces[puits]
+
+
 
 def executer_push_relabel(capacites, noms):
     push_relabel(capacites, noms)
 
 
-# ------------------------------
-# Algorithme Bellman
-# ------------------------------
 
-def executer_flot_min_cout(capacites, couts, noms) : 
-    
+
+##def executer_flot_min_cout(capacites, couts, noms) : 
