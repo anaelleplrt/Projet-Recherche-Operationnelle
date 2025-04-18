@@ -1,0 +1,154 @@
+🔁 Graphe 3 — Ford-Fulkerson
+
+=== Matrice des capacités ===
+      s   a   b   c   d   e   f   t
+   -----------------------------------
+ s |   0   5   8   4   0   0   0   0
+ a |   0   0   4   0   7   0   0   0
+ b |   0   0   0   0   0   7   8   0
+ c |   0   0   7   0   0   0   4   0
+ d |   0   0   0   0   0   6   0   0
+ e |   0   0   0   0   0   0   0   7
+ f |   0   0   0   0   0   0   0  10
+ t |   0   0   0   0   0   0   0   0
+
+🔧 Résolution avec Ford-Fulkerson :
+
+★ Itération 1 :
+Le parcours en largeur :
+s
+abc ; Π(a) = s ; Π(b) = s ; Π(c) = s
+def ; Π(d) = a ; Π(e) = b ; Π(f) = b
+t ; Π(t) = e
+
+Détection d’une chaîne améliorante : sbet de flot 7
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+      s   a   b   c   d   e   f   t
+   -----------------------------------
+ s |   0   5   1   4   0   0   0   0
+ a |   0   0   4   0   7   0   0   0
+ b |   7   0   0   0   0   0   8   0
+ c |   0   0   7   0   0   0   4   0
+ d |   0   0   0   0   0   6   0   0
+ e |   0   0   7   0   0   0   0   0
+ f |   0   0   0   0   0   0   0  10
+ t |   0   0   0   0   0   7   0   0
+
+★ Itération 2 :
+Le parcours en largeur :
+s
+abc ; Π(a) = s ; Π(b) = s ; Π(c) = s
+df ; Π(d) = a ; Π(f) = b
+et ; Π(e) = d ; Π(t) = f
+
+Détection d’une chaîne améliorante : sbft de flot 1
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  5  0  4  0  0  0  0
+ a |  0  0  4  0  7  0  0  0
+ b |  8  0  0  0  0  0  7  0
+ c |  0  0  7  0  0  0  4  0
+ d |  0  0  0  0  0  6  0  0
+ e |  0  0  7  0  0  0  0  0
+ f |  0  0  1  0  0  0  0  9
+ t |  0  0  0  0  0  7  1  0
+
+★ Itération 3 :
+Le parcours en largeur :
+s
+ac ; Π(a) = s ; Π(c) = s
+bdf ; Π(b) = a ; Π(d) = a ; Π(f) = c
+et ; Π(e) = d ; Π(t) = f
+
+Détection d’une chaîne améliorante : scft de flot 4
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  5  0  0  0  0  0  0
+ a |  0  0  4  0  7  0  0  0
+ b |  8  0  0  0  0  0  7  0
+ c |  4  0  7  0  0  0  0  0
+ d |  0  0  0  0  0  6  0  0
+ e |  0  0  7  0  0  0  0  0
+ f |  0  0  1  4  0  0  0  5
+ t |  0  0  0  0  0  7  5  0
+
+★ Itération 4 :
+Le parcours en largeur :
+s
+a ; Π(a) = s
+bd ; Π(b) = a ; Π(d) = a
+fe ; Π(f) = b ; Π(e) = d
+ct ; Π(c) = f ; Π(t) = f
+
+Détection d’une chaîne améliorante : sabft de flot 4
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  1  0  0  0  0  0  0
+ a |  4  0  0  0  7  0  0  0
+ b |  8  4  0  0  0  0  3  0
+ c |  4  0  7  0  0  0  0  0
+ d |  0  0  0  0  0  6  0  0
+ e |  0  0  7  0  0  0  0  0
+ f |  0  0  5  4  0  0  0  1
+ t |  0  0  0  0  0  7  9  0
+
+★ Itération 5 :
+Le parcours en largeur :
+s
+a ; Π(a) = s
+d ; Π(d) = a
+e ; Π(e) = d
+b ; Π(b) = e
+f ; Π(f) = b
+ct ; Π(c) = f ; Π(t) = f
+
+Détection d’une chaîne améliorante : sadebft de flot 1
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+      s   a   b   c   d   e   f   t
+   -----------------------------------
+ s |   0   0   0   0   0   0   0   0
+ a |   5   0   0   0   6   0   0   0
+ b |   8   4   0   0   0   1   2   0
+ c |   4   0   7   0   0   0   0   0
+ d |   0   1   0   0   0   5   0   0
+ e |   0   0   6   0   1   0   0   0
+ f |   0   0   6   4   0   0   0   0
+ t |   0   0   0   0   0   7  10   0
+
+★ Itération 6 :
+Le parcours en largeur :
+s
+
+★ Affichage du flot max :
+
+=== Flot maximum ===
+         s      a      b      c      d      e      f      t
+   -----------------------------------------------------------
+ s |      0    5/5    8/8    4/4      0      0      0      0
+ a |      0      0    4/4      0    1/7      0      0      0
+ b |      0      0      0      0      0    6/7    6/8      0
+ c |      0      0    0/7      0      0      0    4/4      0
+ d |      0      0      0      0      0    1/6      0      0
+ e |      0      0      0      0      0      0      0    7/7
+ f |      0      0      0      0      0      0      0  10/10
+ t |      0      0      0      0      0      0      0      0
+
+Valeur du flot max = 17

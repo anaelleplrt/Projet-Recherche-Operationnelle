@@ -1,0 +1,153 @@
+🔁 Graphe 1 — Ford-Fulkerson
+
+=== Matrice des capacités ===
+      s   a   b   c   d   e   f   t
+   -----------------------------------
+ s |   0   9   5   7   0   0   0   0
+ a |   0   0   6   0   6   0   0   0
+ b |   0   0   0   0   0   7   0   0
+ c |   0   0   0   0   0   2   8   0
+ d |   0   0   3   0   0   0   0   8
+ e |   0   0   0   0   0   0   0  10
+ f |   0   0   0   0   0   3   0   5
+ t |   0   0   0   0   0   0   0   0
+
+🔧 Résolution avec Ford-Fulkerson :
+
+★ Itération 1 :
+Le parcours en largeur :
+s
+abc ; Π(a) = s ; Π(b) = s ; Π(c) = s
+def ; Π(d) = a ; Π(e) = b ; Π(f) = c
+t ; Π(t) = d
+
+Détection d’une chaîne améliorante : sadt de flot 6
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+      s   a   b   c   d   e   f   t
+   -----------------------------------
+ s |   0   3   5   7   0   0   0   0
+ a |   6   0   6   0   0   0   0   0
+ b |   0   0   0   0   0   7   0   0
+ c |   0   0   0   0   0   2   8   0
+ d |   0   6   3   0   0   0   0   2
+ e |   0   0   0   0   0   0   0  10
+ f |   0   0   0   0   0   3   0   5
+ t |   0   0   0   0   6   0   0   0
+
+★ Itération 2 :
+Le parcours en largeur :
+s
+abc ; Π(a) = s ; Π(b) = s ; Π(c) = s
+ef ; Π(e) = b ; Π(f) = c
+t ; Π(t) = e
+
+Détection d’une chaîne améliorante : sbet de flot 5
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  3  0  7  0  0  0  0
+ a |  6  0  6  0  0  0  0  0
+ b |  5  0  0  0  0  2  0  0
+ c |  0  0  0  0  0  2  8  0
+ d |  0  6  3  0  0  0  0  2
+ e |  0  0  5  0  0  0  0  5
+ f |  0  0  0  0  0  3  0  5
+ t |  0  0  0  0  6  5  0  0
+
+★ Itération 3 :
+Le parcours en largeur :
+s
+ac ; Π(a) = s ; Π(c) = s
+bef ; Π(b) = a ; Π(e) = c ; Π(f) = c
+t ; Π(t) = e
+
+Détection d’une chaîne améliorante : scet de flot 2
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  3  0  5  0  0  0  0
+ a |  6  0  6  0  0  0  0  0
+ b |  5  0  0  0  0  2  0  0
+ c |  2  0  0  0  0  0  8  0
+ d |  0  6  3  0  0  0  0  2
+ e |  0  0  5  2  0  0  0  3
+ f |  0  0  0  0  0  3  0  5
+ t |  0  0  0  0  6  7  0  0
+
+★ Itération 4 :
+Le parcours en largeur :
+s
+ac ; Π(a) = s ; Π(c) = s
+bf ; Π(b) = a ; Π(f) = c
+et ; Π(e) = b ; Π(t) = f
+
+Détection d’une chaîne améliorante : scft de flot 5
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  3  0  0  0  0  0  0
+ a |  6  0  6  0  0  0  0  0
+ b |  5  0  0  0  0  2  0  0
+ c |  7  0  0  0  0  0  3  0
+ d |  0  6  3  0  0  0  0  2
+ e |  0  0  5  2  0  0  0  3
+ f |  0  0  0  5  0  3  0  0
+ t |  0  0  0  0  6  7  5  0
+
+★ Itération 5 :
+Le parcours en largeur :
+s
+a ; Π(a) = s
+b ; Π(b) = a
+e ; Π(e) = b
+ct ; Π(c) = e ; Π(t) = e
+
+Détection d’une chaîne améliorante : sabet de flot 2
+
+Modifications sur le graphe résiduel :
+
+=== Graphe résiduel ===
+     s  a  b  c  d  e  f  t
+   ---------------------------
+ s |  0  1  0  0  0  0  0  0
+ a |  8  0  4  0  0  0  0  0
+ b |  5  2  0  0  0  0  0  0
+ c |  7  0  0  0  0  0  3  0
+ d |  0  6  3  0  0  0  0  2
+ e |  0  0  7  2  0  0  0  1
+ f |  0  0  0  5  0  3  0  0
+ t |  0  0  0  0  6  9  5  0
+
+★ Itération 6 :
+Le parcours en largeur :
+s
+a ; Π(a) = s
+b ; Π(b) = a
+
+★ Affichage du flot max :
+
+=== Flot maximum ===
+        s     a     b     c     d     e     f     t
+   ---------------------------------------------------
+ s |     0   8/9   5/5   7/7     0     0     0     0
+ a |     0     0   2/6     0   6/6     0     0     0
+ b |     0     0     0     0     0   7/7     0     0
+ c |     0     0     0     0     0   2/2   5/8     0
+ d |     0     0   0/3     0     0     0     0   6/8
+ e |     0     0     0     0     0     0     0  9/10
+ f |     0     0     0     0     0   0/3     0   5/5
+ t |     0     0     0     0     0     0     0     0
+
+Valeur du flot max = 20
