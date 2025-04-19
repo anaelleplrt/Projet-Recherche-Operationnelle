@@ -4,7 +4,7 @@ from fonctions import (
     est_flot_a_cout_min,
     executer_ford_fulkerson,
     executer_push_relabel,
-    #executer_flot_min_cout
+    executer_flot_min_cout
 )
 
 def get_noms_sommets(n):
@@ -37,14 +37,15 @@ def menu_principal():
                     afficher_matrice("Matrice des coûts", couts, noms)
 
                     lancer = input("\nVoulez-vous lancer la résolution du flot à coût minimal ? (o/n) : ").lower()
-                    #if lancer == 'o':
-                        #executer_flot_min_cout(capacites, couts, noms)
-                    #else:
-                        #print("Résolution annulée.")
+                    if lancer == 'o':
+                        executer_flot_min_cout(capacites, couts, noms)
+                    else:
+                        print("Résolution annulée.")
                 else:
                     print("\nQuel algorithme souhaitez-vous utiliser ?")
                     print("1 - Ford-Fulkerson")
                     print("2 - Push-Relabel")
+
                     algo = input("Votre choix : ")
 
                     if algo == "1":

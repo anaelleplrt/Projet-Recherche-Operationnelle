@@ -254,6 +254,102 @@ def executer_push_relabel(capacites, noms):
     push_relabel(capacites, noms)
 
 
+# ------------------------------#
+# Algorithme Bellman-Ford       #
+# ------------------------------#
 
 
-##def executer_flot_min_cout(capacites, couts, noms) : 
+def bellman_ford(capacite, couts, source) :
+
+    n = len(couts)
+    min_cout = [float('inf')] * n
+    parent = [-1] * n
+    
+
+    min_cout[source] = 0
+
+    print("\n=== Table de Bellman ===")
+    print(f"Initialisation : {couts}")
+
+    for k in range(n - 1) :
+        changement = False
+        for u in range(n) :
+            for v in range(n) :
+                if capacite[u][v] > 0 and min_cout[u] + couts[u][v] < min_cout[v] :
+                    print(f"Modification : distance[{v}] ({min_cout[v]}) → {min_cout[u] + couts[u][v]} via {u}")
+                    min_cout[v] = min_cout[u] + couts[u][v]
+                    parent[v] = u
+                    changement = True
+        print(f"Distances après l'itération {k + 1} : {couts}")
+        ## si on a pas de changement, on sort de la boucle
+        if not changement :
+            break
+    
+    print("\n=== Résultat final ===")
+    print(f"Distances finales : {couts}")
+    print(f"Parents : {parent}")
+
+    return min_cout, parent
+
+
+def flot_min_cout(capacites, couts, noms, source, puits): 
+    n = len(capacites)
+    residuel = [row[:] for row in capacites]
+    couts_residuel = [row[:] for row in couts]
+    flot_total = 0
+    cout_total = 0
+
+    # Initialiser les coûts inverses
+    for u in range(n):
+        for v in range(n):
+            if capacites[u][v] > 0:
+                couts_residuel[v][u] = -couts[u][v]  # Coût inverse
+
+    while True:
+        distances, parents = bellman_ford(residuel, couts_residuel, source)
+
+        # Si aucun chemin améliorant n'existe, on arrête
+        if distances[puits] == float('inf'):
+            print("\nAucun chemin améliorant trouvé, arrêt.")
+            break
+
+        # Trouver le flot maximal possible sur la chaîne améliorante
+        chemin = []
+        v = puits
+        flot = float('inf')
+        while v != source:
+            u = parents[v]
+            chemin.append((u, v))
+            flot = min(flot, residuel[u][v])
+            v = u
+        chemin.reverse()
+        chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
+
+        print(f"\n🔗 Chaîne améliorante détectée : {chemin_str} avec un flot de {flot} et un coût de {distances[puits]}")
+
+        # Mettre à jour le graphe résiduel
+        v = puits
+        while v != source:
+            u = parents[v]
+            residuel[u][v] -= flot
+            residuel[v][u] += flot
+            v = u
+
+        print("\n🔄 Modifications sur le graphe résiduel :")
+        afficher_matrice("Graphe résiduel", residuel, noms)
+
+        # Mettre à jour le flot total et le coût total
+        flot_total += flot
+        cout_total += flot * distances[puits]
+
+    print(f"\n✅ Flot total = {flot_total}, Coût total = {cout_total}")
+    return flot_total, cout_total
+
+def executer_flot_min_cout(capacites, couts, noms):
+    """
+    Fonction pour exécuter le flot à coût minimal.
+    """
+    source = 0
+    puits = len(capacites) - 1
+    print("\n🔧 Résolution du flot à coût minimal :")
+    flot_min_cout(capacites, couts, noms, source, puits)
