@@ -36,11 +36,11 @@ def menu_principal():
                 if est_flot_a_cout_min(numero):
                     afficher_matrice("Matrice des coûts", couts, noms)
 
-                    lancer = input("\nVoulez-vous lancer la résolution du flot à coût minimal ? (o/n) : ").lower()
-                    if lancer == 'o':
-                        executer_flot_min_cout(capacites, couts, noms)
+                    val_flot = int(input("\nChoisissez la valeur de flot : "))
+                    if val_flot <0 :
+                        print("Valeur pas acceptable")
                     else:
-                        print("Résolution annulée.")
+                        executer_flot_min_cout(capacites, couts, noms,val_flot)
                 else:
                     print("\nQuel algorithme souhaitez-vous utiliser ?")
                     print("1 - Ford-Fulkerson")

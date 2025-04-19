@@ -292,8 +292,8 @@ def bellman_ford(capacite, couts, source) :
     return min_cout, parent
 
 
-def flot_min_cout(capacites, couts, noms, source, puits): 
-    n = len(capacites)
+def flot_min_cout(capacites, couts, noms, source, puits, val_flot): 
+    n = len(couts)
     residuel = [row[:] for row in capacites]
     couts_residuel = [row[:] for row in couts]
     flot_total = 0
@@ -306,10 +306,10 @@ def flot_min_cout(capacites, couts, noms, source, puits):
                 couts_residuel[v][u] = -couts[u][v]  # Coût inverse
 
     while True:
-        distances, parents = bellman_ford(residuel, couts_residuel, source)
+        cout_min, parents = bellman_ford(residuel, couts_residuel, source)
 
         # Si aucun chemin améliorant n'existe, on arrête
-        if distances[puits] == float('inf'):
+        if cout_min[puits] == float('inf'):
             print("\nAucun chemin améliorant trouvé, arrêt.")
             break
 
@@ -325,7 +325,11 @@ def flot_min_cout(capacites, couts, noms, source, puits):
         chemin.reverse()
         chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
 
-        print(f"\n🔗 Chaîne améliorante détectée : {chemin_str} avec un flot de {flot} et un coût de {distances[puits]}")
+        print(f"\nChaîne améliorante détectée : {chemin_str} avec un flot de {flot} et un coût de {cout_min[puits]}")
+
+        if val_flot is not None and flot_total + flot > val_flot:
+            flot = val_flot - flot_total
+            print(f"Ajustement du flot à {val_flot} : flot réduit à {flot}")
 
         # Mettre à jour le graphe résiduel
         v = puits
@@ -340,16 +344,20 @@ def flot_min_cout(capacites, couts, noms, source, puits):
 
         # Mettre à jour le flot total et le coût total
         flot_total += flot
-        cout_total += flot * distances[puits]
+        cout_total += flot * cout_min[puits]
 
-    print(f"\n✅ Flot total = {flot_total}, Coût total = {cout_total}")
+        if val_flot is not 0 and flot_total >= val_flot:
+            print(f"\nValeur cible de flot {val_flot} atteinte!")
+            break
+
+    print(f"\nFlot total = {flot_total}, Coût total = {cout_total}")
     return flot_total, cout_total
 
-def executer_flot_min_cout(capacites, couts, noms):
+def executer_flot_min_cout(capacites, couts, noms, val_flot):
     """
     Fonction pour exécuter le flot à coût minimal.
     """
     source = 0
-    puits = len(capacites) - 1
+    puits = len(couts) - 1
     print("\n🔧 Résolution du flot à coût minimal :")
-    flot_min_cout(capacites, couts, noms, source, puits)
+    flot_min_cout(capacites, couts, noms, source, puits, val_flot)
