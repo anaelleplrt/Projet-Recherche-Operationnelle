@@ -3,6 +3,7 @@ from collections import deque
 import heapq
 from tabulate import tabulate
 import copy
+import time
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -411,7 +412,7 @@ def generer_graphe_flots(n):
     return capacites, couts
 
 def mesurer_temps(fonction, *args):
-    import time
+
     debut = time.perf_counter()
     resultat = fonction(*args)
     fin = time.perf_counter()
