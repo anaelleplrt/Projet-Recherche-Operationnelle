@@ -1,6 +1,7 @@
 from reader import lire_graphe
 from collections import deque
 import heapq
+from tabulate import tabulate
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -19,30 +20,36 @@ def est_flot_a_cout_min(numero):
 # ------------------------
 
 def afficher_matrice(nom, matrice, noms_sommets=None):
-    print(f"\n=== {nom} ===")
     if matrice is None:
         print("Aucune donnée.")
         return
 
-    n = len(matrice)
-    largeur = max(len(str(e)) for row in matrice for e in row) + 1
+    nb_sommets = len(matrice)
+    HEADER_COLOR = '\033[94m'  # Bleu clair
+    INDEX_COLOR = '\033[92m'  # Vert clair
+    NON_ZERO_COLOR = '\033[93m'  # Jaune clair
+    ZERO_COLOR = '\033[90m'  # Gris clair
+    ENDC = '\033[0m'  # Reset
 
-    # Génère automatiquement : s, a, b, ..., t selon n
-    if noms_sommets is None:
-        if n == 1:
-            noms_sommets = ['s']
-        elif n == 2:
-            noms_sommets = ['s', 't']
-        else:
-            noms_sommets = ['s'] + [chr(ord('a') + i - 1) for i in range(1, n - 1)] + ['t']
+    # Headers colorés
+    headers_colored = [HEADER_COLOR + sommet + ENDC for sommet in noms_sommets]
+    index_colored = [INDEX_COLOR + sommet + ENDC for sommet in noms_sommets]
 
-    header = "    " + " ".join([f"{nom:>{largeur}}" for nom in noms_sommets])
-    print(header)
-    print("   " + "-" * len(header))
+    # Matrice colorée
+    colored_matrix = []
+    for row in matrice:
+        colored_row = []
+        for value in row:
+            if int(value) == 0:
+                colored_value = ZERO_COLOR + str(value) + ENDC
+            else:
+                colored_value = NON_ZERO_COLOR + str(value) + ENDC
+            colored_row.append(colored_value)
+        colored_matrix.append(colored_row)
 
-    for i, ligne in enumerate(matrice):
-        ligne_str = " ".join([f"{val:>{largeur}}" for val in ligne])
-        print(f"{noms_sommets[i]:>2} | {ligne_str}")
+    print(f"\nIl y a {nb_sommets} sommets.")
+    print(f"\n=== {nom} ===")
+    print(tabulate(colored_matrix, headers=headers_colored, showindex=index_colored, tablefmt="fancy_grid"))
 
 
 # Fonction principale de traitement du graphe
