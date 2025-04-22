@@ -385,3 +385,26 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
     puits = len(capacites) - 1
     print("\n🔧 Résolution du flot à coût minimal :")
     flot_min_cout(capacites, couts, noms, source, puits, val_flot)
+
+
+def generer_graphe_flots(n):
+    # Initialiser matrices C et D pleines de 0
+    capacites = [[0 for i in range(n)] for j in range(n)]
+    couts = [[0 for k in range(n)] for l in range(n)]
+
+    # Calcul du nombre de couples à remplir : E(n^2 / 2)
+    nb_couples = (n * n) // 2
+
+    # Générer tous les couples possibles (i, j) avec i ≠ j
+    couples_possibles = [(i, j) for i in range(n) for j in range(n) if i != j]
+
+    # Tirer au hasard nb_couples sans remise
+    couples_selectionnes = sample(couples_possibles, nb_couples)
+
+    for (i, j) in couples_selectionnes:
+        capacites[i][j] = randint(1, 100)  # Capacité entre 1 et 100
+        couts[i][j] = randint(1, 100)       # Coût entre 1 et 100 si capacité non nulle
+        
+    afficher_matrice("Matrice ALEATOIRE des capacités", capacites)
+    afficher_matrice("Matrice ALEATOIRE des couts", couts)
+    return capacites, couts
