@@ -25,40 +25,12 @@ def afficher_matrice(nom, matrice, noms_sommets=None):
         return
 
     nb_sommets = len(matrice)
-    HEADER_COLOR = '\033[94m'  # Bleu clair
-    INDEX_COLOR = '\033[92m'  # Vert clair
-    NON_ZERO_COLOR = '\033[93m'  # Jaune clair
-    ZERO_COLOR = '\033[90m'  # Gris clair
-    ENDC = '\033[0m'  # Reset
 
-    # Headers colorés
-    headers_colored = [HEADER_COLOR + sommet + ENDC for sommet in noms_sommets]
-    index_colored = [INDEX_COLOR + sommet + ENDC for sommet in noms_sommets]
+    if noms_sommets is None:
+        get_noms_sommets(nb_sommets)
 
-    # Matrice colorée
-    colored_matrix = []
-    for row in matrice:
-        colored_row = []
-        for value in row:
-            try:
-                numeric_value = int(value)
-            except ValueError:
-                numeric_value = None  # valeur textuelle
-
-            if numeric_value is None:
-                colored_value = str(value)  # Ne pas colorer les chaînes comme "5/10"
-            elif numeric_value == 0:
-                colored_value = ZERO_COLOR + str(value) + ENDC
-            else:
-                colored_value = NON_ZERO_COLOR + str(value) + ENDC
-
-            colored_row.append(colored_value)
-        colored_matrix.append(colored_row)
-
-    
     print(f"\n=== {nom} ===")
-    print(tabulate(colored_matrix, headers=headers_colored, showindex=index_colored, tablefmt="fancy_grid"))
-
+    print(tabulate(matrice, headers=noms_sommets, showindex=noms_sommets, tablefmt="fancy_grid"))
 
 
 
