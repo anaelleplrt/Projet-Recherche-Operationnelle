@@ -1,6 +1,7 @@
 from reader import lire_graphe
 from collections import deque
 import heapq
+from tabulate import tabulate
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -19,30 +20,44 @@ def est_flot_a_cout_min(numero):
 # ------------------------
 
 def afficher_matrice(nom, matrice, noms_sommets=None):
-    print(f"\n=== {nom} ===")
     if matrice is None:
         print("Aucune donnée.")
         return
 
-    n = len(matrice)
-    largeur = max(len(str(e)) for row in matrice for e in row) + 1
+    nb_sommets = len(matrice)
+    HEADER_COLOR = '\033[94m'  # Bleu clair
+    INDEX_COLOR = '\033[92m'  # Vert clair
+    NON_ZERO_COLOR = '\033[93m'  # Jaune clair
+    ZERO_COLOR = '\033[90m'  # Gris clair
+    ENDC = '\033[0m'  # Reset
 
-    # Génère automatiquement : s, a, b, ..., t selon n
-    if noms_sommets is None:
-        if n == 1:
-            noms_sommets = ['s']
-        elif n == 2:
-            noms_sommets = ['s', 't']
-        else:
-            noms_sommets = ['s'] + [chr(ord('a') + i - 1) for i in range(1, n - 1)] + ['t']
+    # Headers colorés
+    headers_colored = [HEADER_COLOR + sommet + ENDC for sommet in noms_sommets]
+    index_colored = [INDEX_COLOR + sommet + ENDC for sommet in noms_sommets]
 
-    header = "    " + " ".join([f"{nom:>{largeur}}" for nom in noms_sommets])
-    print(header)
-    print("   " + "-" * len(header))
+    # Matrice colorée
+    colored_matrix = []
+    for row in matrice:
+        colored_row = []
+        for value in row:
+            try:
+                numeric_value = int(value)
+            except ValueError:
+                numeric_value = None  # valeur textuelle
 
-    for i, ligne in enumerate(matrice):
-        ligne_str = " ".join([f"{val:>{largeur}}" for val in ligne])
-        print(f"{noms_sommets[i]:>2} | {ligne_str}")
+            if numeric_value is None:
+                colored_value = str(value)  # Ne pas colorer les chaînes comme "5/10"
+            elif numeric_value == 0:
+                colored_value = ZERO_COLOR + str(value) + ENDC
+            else:
+                colored_value = NON_ZERO_COLOR + str(value) + ENDC
+
+            colored_row.append(colored_value)
+        colored_matrix.append(colored_row)
+
+    
+    print(f"\n=== {nom} ===")
+    print(tabulate(colored_matrix, headers=headers_colored, showindex=index_colored, tablefmt="fancy_grid"))
 
 
 # Fonction principale de traitement du graphe
@@ -234,8 +249,6 @@ def push_relabel(capacites, noms):
 
         iteration += 1
 
-    print(f"\n✅ Flot maximum total = {exces[puits]}")
-
     print("\n★ Affichage du flot max :")
     matrice_flot = [[0]*n for _ in range(n)]
     for u in range(n):
@@ -245,6 +258,9 @@ def push_relabel(capacites, noms):
             else:
                 matrice_flot[u][v] = "0"
     afficher_matrice("Flot maximum", matrice_flot, noms)
+
+    print(f"\n✅ Flot maximum total = {exces[puits]}")
+
 
     return exces[puits]
 
