@@ -55,7 +55,7 @@ def afficher_matrice(nom, matrice, noms_sommets=None):
             colored_row.append(colored_value)
         colored_matrix.append(colored_row)
 
-    print(f"\nIl y a {nb_sommets} sommets.")
+    
     print(f"\n=== {nom} ===")
     print(tabulate(colored_matrix, headers=headers_colored, showindex=index_colored, tablefmt="fancy_grid"))
 
@@ -249,8 +249,6 @@ def push_relabel(capacites, noms):
 
         iteration += 1
 
-    print(f"\n✅ Flot maximum total = {exces[puits]}")
-
     print("\n★ Affichage du flot max :")
     matrice_flot = [[0]*n for _ in range(n)]
     for u in range(n):
@@ -260,6 +258,9 @@ def push_relabel(capacites, noms):
             else:
                 matrice_flot[u][v] = "0"
     afficher_matrice("Flot maximum", matrice_flot, noms)
+
+    print(f"\n✅ Flot maximum total = {exces[puits]}")
+
 
     return exces[puits]
 
