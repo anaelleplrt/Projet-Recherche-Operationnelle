@@ -36,11 +36,22 @@ def menu_principal():
                 if est_flot_a_cout_min(numero):
                     afficher_matrice("Matrice des coûts", couts, noms)
 
-                    val_flot = int(input("\nChoisissez la valeur de flot : "))
-                    if val_flot <0 :
-                        print("Valeur pas acceptable")
+                    sortie_s = sum(capacites[0])
+                    entree_t = sum(capacites[i][n-1] for i in range(n))
+                    valeur_max_possible = min(sortie_s, entree_t)
+
+                    print(f"\nCapacité maximale sortante de s : {sortie_s}")
+                    print(f"Capacité maximale entrante dans t : {entree_t}")
+                    print(f"Vous pouvez envoyer au maximum : {valeur_max_possible}")
+
+                    val_flot = int(input("\nChoisissez la valeur de flot à envoyer : "))
+
+                    if val_flot <= 0:
+                        print("❌ Valeur non valide. Elle doit être strictement positive.")
+                    elif val_flot > valeur_max_possible:
+                        print("❌ Valeur trop élevée. Elle dépasse ce que le réseau peut supporter.")
                     else:
-                        executer_flot_min_cout(capacites, couts, noms,val_flot)
+                        executer_flot_min_cout(capacites, couts, noms, val_flot)
                 else:
                     print("\nQuel algorithme souhaitez-vous utiliser ?")
                     print("1 - Ford-Fulkerson")
