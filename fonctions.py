@@ -40,10 +40,18 @@ def afficher_matrice(nom, matrice, noms_sommets=None):
     for row in matrice:
         colored_row = []
         for value in row:
-            if int(value) == 0:
+            try:
+                numeric_value = int(value)
+            except ValueError:
+                numeric_value = None  # valeur textuelle
+
+            if numeric_value is None:
+                colored_value = str(value)  # Ne pas colorer les chaînes comme "5/10"
+            elif numeric_value == 0:
                 colored_value = ZERO_COLOR + str(value) + ENDC
             else:
                 colored_value = NON_ZERO_COLOR + str(value) + ENDC
+
             colored_row.append(colored_value)
         colored_matrix.append(colored_row)
 
