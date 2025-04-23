@@ -4,6 +4,9 @@ import heapq
 from tabulate import tabulate
 import copy
 import time
+from random import sample, randint
+import os
+import csv
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -407,9 +410,10 @@ def generer_graphe_flots(n):
         capacites[i][j] = randint(1, 100)  # Capacité entre 1 et 100
         couts[i][j] = randint(1, 100)       # Coût entre 1 et 100 si capacité non nulle
         
-    afficher_matrice("Matrice ALEATOIRE des capacités", capacites)
-    afficher_matrice("Matrice ALEATOIRE des couts", couts)
-    return capacites, couts
+    noms_sommets = get_noms_sommets(n)
+    afficher_matrice("Matrice ALEATOIRE des capacités", capacites, noms_sommets)
+    afficher_matrice("Matrice ALEATOIRE des couts", couts, noms_sommets)
+    return capacites, couts, noms_sommets
 
 def mesurer_temps(fonction, *args):
 
@@ -422,8 +426,7 @@ def mesurer_temps(fonction, *args):
 
 def comparer_algorithmes(n):
     print(f"\n=== COMPARAISON DES ALGORITHMES POUR n = {n} ===")
-    capacites, couts = generer_graphe_flots(n)
-    noms = get_noms_sommets(n)
+    capacites, couts, noms = generer_graphe_flots(n)
     source = 0
     puits = n - 1
 
@@ -437,3 +440,18 @@ def comparer_algorithmes(n):
     print(f"Flot max Ford-Fulkerson : {flot_ff} pour un temps de {temps_ff} secondes")
     print(f"Flot max Push-Relabel : {flot_pr} pour un temps de {temps_pr} secondes")
     print(f"Flot min-coût (flot = {flot_min}) avec un temps de {temps_flot_min} secondes")
+    sauvegarder_resultat_csv(n, temps_ff, temps_pr, temps_flot_min)
+
+def sauvegarder_resultat_csv(n, temps_ff, temps_pr, temps_flot_min):
+    fichier = "resultats_algorithmes.csv"
+    ajout_entete = not os.path.exists(fichier)
+    with open(fichier, mode='a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        if ajout_entete:
+            writer.writerow(["n", "Temps_FF", "Temps_PR", "Temps_MinCout"])
+        writer.writerow([n, temps_ff, temps_pr, temps_flot_min])
+
+#test
+if __name__ == "__main__":
+    for taille in [3, 10, 15, 20]:
+        comparer_algorithmes(taille)
