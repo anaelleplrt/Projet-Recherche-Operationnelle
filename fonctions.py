@@ -251,27 +251,7 @@ def executer_push_relabel(capacites, noms):
 # ------------------------------#
 
 
-# ------------------------------#
-# Fonction Bellman détaillée    #
-# ------------------------------#
 
-def afficher_table_bellman_detaillee(noms, etapes):
-    print("\n📊 Table de Bellman complète :")
-    table = []
-    for k, (distances, parents) in enumerate(etapes):
-        ligne = [str(k)]
-        for i in range(len(noms)):
-            if distances[i] == float('inf'):
-                val = "+∞"
-            else:
-                parent = parents[i]
-                if parent == -1:
-                    val = str(distances[i])
-                else:
-                    val = f"{distances[i]}{noms[parent].lower()}"
-            ligne.append(val)
-        table.append(ligne)
-    print(tabulate(table, headers=["k"] + noms, tablefmt="fancy_grid"))
 
 # ------------------------------#
 # Graphe résiduel pondéré       #
@@ -289,6 +269,28 @@ def afficher_graphe_residuel_pondere(residuel, couts_residuel, noms):
     afficher_matrice("Graphe résiduel pondéré (capacité ; coût)", graphe_mixte, noms)
 
 # ------------------------------#
+# Fonction Bellman détaillée    #
+# ------------------------------#
+
+def afficher_table_bellman_detaillee(noms, etapes):
+    print("\n=== Table de Bellman complète ===")
+    table = []
+    for k, (distances, parents) in enumerate(etapes):
+        ligne = [str(k)]
+        for i in range(len(noms)):
+            if distances[i] == float('inf'):
+                val = "+∞"
+            else:
+                parent = parents[i]
+                if parent == -1:
+                    val = str(distances[i])
+                else:
+                    val = f"{distances[i]}{noms[parent].lower()}"
+            ligne.append(val)
+        table.append(ligne)
+    print(tabulate(table, headers=["k"] + noms, tablefmt="fancy_grid"))
+
+# ------------------------------#
 # Flot à coût minimal           #
 # ------------------------------#
 
@@ -301,13 +303,21 @@ def bellman_ford(capacite, couts, source):
 
     for k in range(n - 1):
         changement = False
-        for u in range(n):
-            for v in range(n):
-                if capacite[u][v] > 0 and min_cout[u] + couts[u][v] < min_cout[v]:
-                    min_cout[v] = min_cout[u] + couts[u][v]
-                    parent[v] = u
+        nouv_cout = min_cout[:]
+        nouv_parent = parent[:]
+
+        for v in range(n):  # Pour chaque sommet destination
+            for u in range(n):  # Tous les prédécesseurs
+                if capacite[u][v] > 0 and min_cout[u] + couts[u][v] < nouv_cout[v]:
+                    nouv_cout[v] = min_cout[u] + couts[u][v]
+                    nouv_parent[v] = u
                     changement = True
+
+        min_cout = nouv_cout
+        parent = nouv_parent
         etapes.append((min_cout[:], parent[:]))
+
+        # Arrêt anticipé si aucun changement détecté
         if not changement:
             break
 

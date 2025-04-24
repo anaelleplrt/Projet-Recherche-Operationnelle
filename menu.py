@@ -4,7 +4,9 @@ from fonctions import (
     est_flot_a_cout_min,
     executer_ford_fulkerson,
     executer_push_relabel,
-    executer_flot_min_cout
+    executer_flot_min_cout,
+    afficher_table_bellman_detaillee,
+    bellman_ford
 )
 
 def get_noms_sommets(n):
@@ -35,6 +37,11 @@ def menu_principal():
 
                 if est_flot_a_cout_min(numero):
                     afficher_matrice("Matrice des coûts", couts, noms)
+
+                    source = 0
+
+                    _,_, etapes = bellman_ford(capacites, couts, source)
+                    afficher_table_bellman_detaillee(noms, etapes)
 
                     sortie_s = sum(capacites[0])
                     entree_t = sum(capacites[i][n-1] for i in range(n))
