@@ -4,6 +4,9 @@ import heapq
 from tabulate import tabulate
 import copy
 import time
+from random import sample, randint
+import os
+import csv
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -417,9 +420,10 @@ def generer_graphe_flots(n):
         capacites[i][j] = randint(1, 100)  # Capacité entre 1 et 100
         couts[i][j] = randint(1, 100)       # Coût entre 1 et 100 si capacité non nulle
         
-    afficher_matrice("Matrice ALEATOIRE des capacités", capacites)
-    afficher_matrice("Matrice ALEATOIRE des couts", couts)
-    return capacites, couts
+    noms_sommets = get_noms_sommets(n)
+    afficher_matrice("Matrice ALEATOIRE des capacités", capacites, noms_sommets)
+    afficher_matrice("Matrice ALEATOIRE des couts", couts, noms_sommets)
+    return capacites, couts, noms_sommets
 
 def mesurer_temps(fonction, *args):
 
@@ -432,8 +436,7 @@ def mesurer_temps(fonction, *args):
 
 def comparer_algorithmes(n):
     print(f"\n=== COMPARAISON DES ALGORITHMES POUR n = {n} ===")
-    capacites, couts = generer_graphe_flots(n)
-    noms = get_noms_sommets(n)
+    capacites, couts, noms = generer_graphe_flots(n)
     source = 0
     puits = n - 1
 
