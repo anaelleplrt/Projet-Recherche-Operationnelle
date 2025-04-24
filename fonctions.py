@@ -65,16 +65,17 @@ def traiter_graphe(numero):
 # ------------------------------
 
 #Parcours en largeur
-def bfs(capacites, residuel, source, puits, parent, noms, iteration):
+def bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=True):
     n = len(capacites)
     visited = [False] * n
     queue = deque()
     queue.append(source)
     visited[source] = True
 
-    print(f"\n★ Itération {iteration} :")
-    print("Le parcours en largeur :")
-    print(noms[source])
+    if afficher:
+        print(f"\n★ Itération {iteration} :")
+        print("Le parcours en largeur :")
+        print(noms[source])
 
     niveaux = [[source]]  # liste des sommets par niveau
     level = 0
@@ -93,23 +94,25 @@ def bfs(capacites, residuel, source, puits, parent, noms, iteration):
                     ligne_parents.append(f"Π({noms[v]}) = {noms[u]}")
                     if v == puits:
                         niveaux.append(next_level)
-                        print("".join(ligne_sommets) + " ; " + " ; ".join(ligne_parents))
+                        if afficher:
+                            print("".join(ligne_sommets) + " ; " + " ; ".join(ligne_parents))
                         return True
-        if ligne_sommets:
+        if ligne_sommets and afficher:
             print("".join(ligne_sommets) + " ; " + " ; ".join(ligne_parents))
         niveaux.append(next_level)
         level += 1
 
     return False
 
-def ford_fulkerson(capacites, source, puits, noms):
+
+def ford_fulkerson(capacites, source, puits, noms, afficher=True):
     n = len(capacites)
     residuel = [row[:] for row in capacites]
     parent = [-1] * n
     flot_max = 0
     iteration = 1
 
-    while bfs(capacites, residuel, source, puits, parent, noms, iteration):
+    while bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=afficher):
         chemin = []
         v = puits
         flot = float('inf')
@@ -121,7 +124,8 @@ def ford_fulkerson(capacites, source, puits, noms):
         chemin.reverse()
         chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
 
-        print(f"\nDétection d’une chaîne améliorante : {chemin_str} de flot {flot}")
+        if afficher:
+            print(f"\nDétection d’une chaîne améliorante : {chemin_str} de flot {flot}")
 
         v = puits
         while v != source:
@@ -130,30 +134,34 @@ def ford_fulkerson(capacites, source, puits, noms):
             residuel[v][u] += flot
             v = u
 
-        print("\nModifications sur le graphe résiduel :")
-        afficher_matrice("Graphe résiduel", residuel, noms)
+        if afficher:
+            print("\nModifications sur le graphe résiduel :")
+            afficher_matrice("Graphe résiduel", residuel, noms)
 
         flot_max += flot
         iteration += 1
 
-    print("\n★ Affichage du flot max :")
-    matrice_flot = [[0]*n for _ in range(n)]
-    for u in range(n):
-        for v in range(n):
-            if capacites[u][v] > 0:
-                matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
-            else:
-                matrice_flot[u][v] = "0"
+    if afficher:
+        print("\n★ Affichage du flot max :")
+        matrice_flot = [[0]*n for _ in range(n)]
+        for u in range(n):
+            for v in range(n):
+                if capacites[u][v] > 0:
+                    matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
+                else:
+                    matrice_flot[u][v] = "0"
+        afficher_matrice("Flot maximum", matrice_flot, noms)
+        print(f"\nValeur du flot max = {flot_max}")
 
-    afficher_matrice("Flot maximum", matrice_flot, noms)
-    print(f"\nValeur du flot max = {flot_max}")
     return flot_max
 
-def executer_ford_fulkerson(capacites, noms):
+def executer_ford_fulkerson(capacites, noms, afficher=True):
     source = 0
     puits = len(capacites) - 1
-    print("\n🔧 Résolution avec Ford-Fulkerson :")
-    return ford_fulkerson(capacites, source, puits, noms)
+    if afficher:
+        print("\n🔧 Résolution avec Ford-Fulkerson :")
+    return ford_fulkerson(capacites, source, puits, noms, afficher=afficher)
+
 
 
 
@@ -161,7 +169,7 @@ def executer_ford_fulkerson(capacites, noms):
 # Algorithme Pousser-Réétiqueter
 # ------------------------------
 
-def push_relabel(capacites, noms):
+def push_relabel(capacites, noms, afficher=True):
     n = len(capacites)
     source = 0
     puits = n - 1
@@ -186,7 +194,8 @@ def push_relabel(capacites, noms):
         residuel[v][u] += delta
         exces[u] -= delta
         exces[v] += delta
-        print(f"🔄 Push : {noms[u]} → {noms[v]} (Δ = {delta})")
+        if afficher:
+            print(f"🔄 Push : {noms[u]} → {noms[v]} (Δ = {delta})")
 
     def relabel(u):
         min_h = float('inf')
@@ -194,23 +203,25 @@ def push_relabel(capacites, noms):
             if residuel[u][v] > 0:
                 min_h = min(min_h, hauteur[v])
         if min_h < float('inf'):
-            print(f"⤴️ Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
+            if afficher:
+                print(f"⤴️ Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
             hauteur[u] = min_h + 1
 
     def afficher_etat(iteration):
-        print(f"\n★ Itération {iteration} :")
-        print("Hauteur :", {noms[i]: h for i, h in enumerate(hauteur)})
-        print("Excès   :", {noms[i]: e for i, e in enumerate(exces)})
-        afficher_matrice("Graphe résiduel", residuel, noms)
+        if afficher:
+            print(f"\n★ Itération {iteration} :")
+            print("Hauteur :", {noms[i]: h for i, h in enumerate(hauteur)})
+            print("Excès   :", {noms[i]: e for i, e in enumerate(exces)})
+            afficher_matrice("Graphe résiduel", residuel, noms)
 
     def choisir_sommet_actif():
         candidats = [(hauteur[i], noms[i], i) for i in range(n) if i != source and i != puits and exces[i] > 0]
         if not candidats:
             return None
-        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2]  # par hauteur décroissante puis ordre alphabétique
+        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2]
 
-    # Lancement
-    print("\n🔧 Résolution avec Push-Relabel :")
+    if afficher:
+        print("\n🔧 Résolution avec Push-Relabel :")
     iteration = 1
     afficher_etat(iteration)
 
@@ -233,25 +244,23 @@ def push_relabel(capacites, noms):
 
         iteration += 1
 
-    print("\n★ Affichage du flot max :")
-    matrice_flot = [[0]*n for _ in range(n)]
-    for u in range(n):
-        for v in range(n):
-            if capacites[u][v] > 0:
-                matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
-            else:
-                matrice_flot[u][v] = "0"
-    afficher_matrice("Flot maximum", matrice_flot, noms)
-
-    print(f"\n✅ Flot maximum total = {exces[puits]}")
-
+    if afficher:
+        print("\n★ Affichage du flot max :")
+        matrice_flot = [[0]*n for _ in range(n)]
+        for u in range(n):
+            for v in range(n):
+                if capacites[u][v] > 0:
+                    matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
+                else:
+                    matrice_flot[u][v] = "0"
+        afficher_matrice("Flot maximum", matrice_flot, noms)
+        print(f"\n✅ Flot maximum total = {exces[puits]}")
 
     return exces[puits]
 
+def executer_push_relabel(capacites, noms, afficher=True):
+    return push_relabel(capacites, noms, afficher=afficher)
 
-
-def executer_push_relabel(capacites, noms):
-    return push_relabel(capacites, noms)
 
 
 
@@ -315,7 +324,7 @@ def afficher_table_bellman_detaillee(noms, etapes):
 # Flot à coût minimal           #
 # ------------------------------#
 
-def executer_flot_min_cout(capacites, couts, noms, val_flot):
+def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True): 
     n = len(capacites)
     source = 0
     puits = n - 1
@@ -326,10 +335,10 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
     couts_residuel = [row[:] for row in couts]
 
     iteration = 1
-    print("\n🚀 Démarrage de l'algorithme de flot à coût minimal...")
+    if afficher:
+        print("\n🚀 Démarrage de l'algorithme de flot à coût minimal...")
 
     while flot_total < val_flot:
-        # --- Bellman-Ford sur le graphe résiduel pondéré ---
         distances = [float('inf')] * n
         parents = [-1] * n
         distances[source] = 0
@@ -338,32 +347,25 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
         for _ in range(n - 1):
             new_distances = distances[:]
             new_parents = parents[:]
-
             for u in range(n):
                 for v in range(n):
-                    if residuel[u][v] > 0:
-                        if distances[u] + couts_residuel[u][v] < new_distances[v]:
-                            new_distances[v] = distances[u] + couts_residuel[u][v]
-                            new_parents[v] = u
-
+                    if residuel[u][v] > 0 and distances[u] + couts_residuel[u][v] < new_distances[v]:
+                        new_distances[v] = distances[u] + couts_residuel[u][v]
+                        new_parents[v] = u
             etapes.append((new_distances[:], new_parents[:]))
-
-            # 💡 Stop si aucune modification
             if new_distances == distances:
                 break
-
             distances = new_distances
             parents = new_parents
 
-
-
-        afficher_table_bellman_detaillee(noms, etapes)
+        if afficher:
+            afficher_table_bellman_detaillee(noms, etapes)
 
         if distances[puits] == float('inf'):
-            print("\n❌ Aucun chemin de coût minimal disponible. Arrêt.")
+            if afficher:
+                print("\n❌ Aucun chemin de coût minimal disponible. Arrêt.")
             break
 
-        # --- Reconstruire le chemin ---
         chemin = []
         v = puits
         while v != source:
@@ -371,18 +373,19 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
             chemin.append((u, v))
             v = u
         chemin.reverse()
-        chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
-        print(f"\n ➡️ Chaîne améliorante de coût minimal trouvée : {chemin_str}")
 
-        # --- Déterminer flot possible ---
+        if afficher:
+            chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
+            print(f"\n➡️ Chaîne améliorante de coût minimal trouvée : {chemin_str}")
+
         flot_augmentable = min(residuel[u][v] for u, v in chemin)
         flot_envoye = min(flot_augmentable, val_flot - flot_total)
         cout_chaine = sum(couts_residuel[u][v] for u, v in chemin)
 
-        print(f" Flot envoyé dans cette chaîne : {flot_envoye}")
-        print(f" Coût unitaire de la chaîne : {cout_chaine}")
+        if afficher:
+            print(f" Flot envoyé dans cette chaîne : {flot_envoye}")
+            print(f" Coût unitaire de la chaîne : {cout_chaine}")
 
-        # --- Mise à jour des graphes résiduels ---
         for u, v in chemin:
             residuel[u][v] -= flot_envoye
             residuel[v][u] += flot_envoye
@@ -391,17 +394,19 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
         flot_total += flot_envoye
         cout_total += flot_envoye * cout_chaine
 
-        print("\n --> Graphe résiduel pondéré mis à jour :")
-        afficher_graphe_residuel_pondere(residuel, couts_residuel, noms)
-
-        print(f"📦 Flot total envoyé : {flot_total} / {val_flot}")
-        print(f"💸 Coût total accumulé : {cout_total}\n")
+        if afficher:
+            print("\n --> Graphe résiduel pondéré mis à jour :")
+            afficher_graphe_residuel_pondere(residuel, couts_residuel, noms)
+            print(f"📦 Flot total envoyé : {flot_total} / {val_flot}")
+            print(f"💸 Coût total accumulé : {cout_total}\n")
 
         iteration += 1
 
-    print("\n✅ Algorithme terminé.")
-    print(f" Flot total envoyé : {flot_total}")
-    print(f" Coût total du flot : {cout_total}")
+    if afficher:
+        print("\n✅ Algorithme terminé.")
+        print(f" Flot total envoyé : {flot_total}")
+        print(f" Coût total du flot : {cout_total}")
+
     return flot_total
 
     
@@ -430,25 +435,21 @@ def generer_graphe_aleatoire(n):
 
 
 
-def mesurer_temps_execution_algos(capacites, couts, noms, val_flot):
-    # Ford-Fulkerson
-    capacites_ff = [row[:] for row in capacites]
+def mesurer_temps_execution_algos(capacites, couts, noms, val_flot, afficher=True):
+    #FF
     start = perf_counter()
-    flot_ff = executer_ford_fulkerson(capacites_ff, noms)
+    flot_ff = executer_ford_fulkerson([row[:] for row in capacites], noms, afficher=afficher)
     t_ff = perf_counter() - start
 
-    # Push-Relabel
-    capacites_pr = [row[:] for row in capacites]
+    #PR
     start = perf_counter()
-    flot_pr = executer_push_relabel(capacites_pr, noms)
+    flot_pr = executer_push_relabel([row[:] for row in capacites], noms, afficher=afficher)
     t_pr = perf_counter() - start
 
-    # Flot à coût min
-    capacites_min = [row[:] for row in capacites]
+    #MIN
     start = perf_counter()
-    flot_min = executer_flot_min_cout(capacites_min, couts, noms, val_flot)
+    flot_min = executer_flot_min_cout([row[:] for row in capacites], couts, noms, val_flot, afficher=afficher)
     t_min = perf_counter() - start
 
     return t_ff, t_pr, t_min, flot_ff, flot_pr, flot_min
-
 

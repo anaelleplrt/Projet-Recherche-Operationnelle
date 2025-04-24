@@ -19,7 +19,7 @@ def tester_n_valeurs(n):
             entree_t = sum(capacites[i][n-1] for i in range(n))
             val_flot = min(sortie_s, entree_t) // 2
 
-            t_ff, t_pr, t_min, _, _, _ = mesurer_temps_execution_algos(capacites, couts, noms, val_flot)
+            t_ff, t_pr, t_min, _, _, _ = mesurer_temps_execution_algos(capacites, couts, noms, val_flot, afficher=False)
             writer.writerow([i, t_ff, t_pr, t_min])
 
     print(f"\n✅ Resultats enregistrés dans {fichier_csv}")
@@ -27,7 +27,7 @@ def tester_n_valeurs(n):
 
 if __name__ == "__main__":
     try:
-        n = int(input("Quelle taille de graphe veux-tu tester ? (ex: 10, 50, 100) : "))
+        n = int(input("Quelle taille de graphe veux-tu tester ? (ex: 10, 50, 100, ...) : "))
         if n < 2:
             print("❌ La taille doit être ≥ 2")
         else:
