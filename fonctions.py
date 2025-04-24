@@ -4,9 +4,11 @@ import heapq
 from tabulate import tabulate
 import copy
 import time
-from random import sample, randint
+import random
 import os
 import csv
+import math
+
 
 # Génère les noms de sommets : s, a, b, ..., t
 def get_noms_sommets(n):
@@ -401,51 +403,19 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
 # ------------------------------#
 # Complexité                    #
 # ------------------------------#
-def generer_graphe_flots(n):
-    # Initialiser matrices C et D pleines de 0
-    capacites = [[0 for i in range(n)] for j in range(n)]
-    couts = [[0 for k in range(n)] for l in range(n)]
 
-    # Calcul du nombre de couples à remplir : E(n^2 / 2)
-    nb_couples = (n * n) // 2
+def generer_graphe_aleatoire(n):
+    capacites = [[0]*n for _ in range(n)]
+    couts = [[0]*n for _ in range(n)]
 
-    # Générer tous les couples possibles (i, j) avec i ≠ j
-    couples_possibles = [(i, j) for i in range(n) for j in range(n) if i != j]
+    nb_valeurs_non_nulles = math.floor((n * n) / 2)
 
-    # Tirer au hasard nb_couples sans remise
-    couples_selectionnes = sample(couples_possibles, nb_couples)
+    # Génère E(n²/2) couples (i ≠ j)
+    couples = [(i, j) for i in range(n) for j in range(n) if i != j]
+    selection = random.sample(couples, nb_valeurs_non_nulles)
 
-    for (i, j) in couples_selectionnes:
-        capacites[i][j] = randint(1, 100)  # Capacité entre 1 et 100
-        couts[i][j] = randint(1, 100)       # Coût entre 1 et 100 si capacité non nulle
-        
-    noms_sommets = get_noms_sommets(n)
-    afficher_matrice("Matrice ALEATOIRE des capacités", capacites, noms_sommets)
-    afficher_matrice("Matrice ALEATOIRE des couts", couts, noms_sommets)
-    return capacites, couts, noms_sommets
+    for i, j in selection:
+        capacites[i][j] = random.randint(1, 100)
+        couts[i][j] = random.randint(1, 100)
 
-def mesurer_temps(fonction, *args):
-
-    debut = time.perf_counter()
-    resultat = fonction(*args)
-    fin = time.perf_counter()
-    temps = fin - debut
-    print(f"Temps d'exécution de {fonction.__name__} : {temps:.6f} secondes")
-    return resultat, temps
-
-def comparer_algorithmes(n):
-    print(f"\n=== COMPARAISON DES ALGORITHMES POUR n = {n} ===")
-    capacites, couts, noms = generer_graphe_flots(n)
-    source = 0
-    puits = n - 1
-
-    flot_ff, temps_ff = mesurer_temps(ford_fulkerson, capacites, source, puits, noms)
-
-    flot_pr, temps_pr = mesurer_temps(push_relabel, capacites, noms)
-    
-    flot_min, temps_flot_min = mesurer_temps(flot_min_cout, capacites, couts, noms, source, puits, flot_ff)
-
-    print("\n=== Résumé final ===")
-    print(f"Flot max Ford-Fulkerson : {flot_ff} pour un temps de {temps_ff} secondes")
-    print(f"Flot max Push-Relabel : {flot_pr} pour un temps de {temps_pr} secondes")
-    print(f"Flot min-coût (flot = {flot_min}) avec un temps de {temps_flot_min} secondes")
+    return capacites, couts
