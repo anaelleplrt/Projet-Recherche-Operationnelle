@@ -7,7 +7,7 @@ from fonctions import (
     executer_ford_fulkerson,
     executer_push_relabel,
     est_flot_a_cout_min,
-    # executer_flot_min_cout  # Décommente si tu l'implémentes
+    executer_flot_min_cout 
 )
 
 GROUPE = "G2"
@@ -49,7 +49,19 @@ def generer_trace(graphe_num):
                 print(f"🔁 Graphe {graphe_num} — Flot à coût minimal")
                 afficher_matrice("Matrice des capacités", capacites, noms)
                 afficher_matrice("Matrice des coûts", couts, noms)
-                # executer_flot_min_cout(capacites, couts, noms)  # Active cette ligne si implémenté
+
+                source = 0
+                puits = len(capacites) - 1
+                sortie_s = sum(capacites[source])
+                entree_t = sum(capacites[i][puits] for i in range(len(capacites)))
+                val_flot = min(sortie_s, entree_t)
+
+                print(f"\nCapacité maximale sortante de s : {sortie_s}")
+                print(f"Capacité maximale entrante dans t : {entree_t}")
+                print(f"✅ Choix automatique de la valeur de flot : {val_flot} (valeur maximale possible)")
+                executer_flot_min_cout(capacites, couts, noms, val_flot)
+
+
 
 def lancer_generation():
     print("\n 📦 Génération des fichiers de traces pour l’équipe", GROUPE)

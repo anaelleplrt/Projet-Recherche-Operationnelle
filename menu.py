@@ -1,20 +1,4 @@
-from fonctions import (
-    lire_graphe,
-    afficher_matrice,
-    est_flot_a_cout_min,
-    executer_ford_fulkerson,
-    executer_push_relabel,
-    executer_flot_min_cout,
-    afficher_table_bellman_detaillee,
-    bellman_ford
-)
-
-def get_noms_sommets(n):
-    if n == 1:
-        return ['s']
-    elif n == 2:
-        return ['s', 't']
-    return ['s'] + [chr(ord('a') + i - 1) for i in range(1, n - 1)] + ['t']
+from fonctions import *
 
 def menu_principal():
     print("=== Projet de Recherche Opérationnelle ===")
