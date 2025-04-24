@@ -8,6 +8,8 @@ import random
 import os
 import csv
 import math
+from time import perf_counter
+
 
 
 # Génère les noms de sommets : s, a, b, ..., t
@@ -151,7 +153,8 @@ def executer_ford_fulkerson(capacites, noms):
     source = 0
     puits = len(capacites) - 1
     print("\n🔧 Résolution avec Ford-Fulkerson :")
-    ford_fulkerson(capacites, source, puits, noms)
+    return ford_fulkerson(capacites, source, puits, noms)
+
 
 
 # ------------------------------
@@ -248,7 +251,8 @@ def push_relabel(capacites, noms):
 
 
 def executer_push_relabel(capacites, noms):
-    push_relabel(capacites, noms)
+    return push_relabel(capacites, noms)
+
 
 
 # ------------------------------#
@@ -398,6 +402,9 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot):
     print("\n✅ Algorithme terminé.")
     print(f" Flot total envoyé : {flot_total}")
     print(f" Coût total du flot : {cout_total}")
+    return flot_total
+
+    
 
 
 # ------------------------------#
@@ -419,3 +426,29 @@ def generer_graphe_aleatoire(n):
         couts[i][j] = random.randint(1, 100)
 
     return capacites, couts
+
+
+
+
+def mesurer_temps_execution_algos(capacites, couts, noms, val_flot):
+    # Ford-Fulkerson
+    capacites_ff = [row[:] for row in capacites]
+    start = perf_counter()
+    flot_ff = executer_ford_fulkerson(capacites_ff, noms)
+    t_ff = perf_counter() - start
+
+    # Push-Relabel
+    capacites_pr = [row[:] for row in capacites]
+    start = perf_counter()
+    flot_pr = executer_push_relabel(capacites_pr, noms)
+    t_pr = perf_counter() - start
+
+    # Flot à coût min
+    capacites_min = [row[:] for row in capacites]
+    start = perf_counter()
+    flot_min = executer_flot_min_cout(capacites_min, couts, noms, val_flot)
+    t_min = perf_counter() - start
+
+    return t_ff, t_pr, t_min, flot_ff, flot_pr, flot_min
+
+

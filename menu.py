@@ -24,28 +24,22 @@ def menu_principal():
                     afficher_matrice("Matrice des capacités", capacites, noms)
                     afficher_matrice("Matrice des coûts", couts, noms)
 
-                    # Mesure de temps Ford-Fulkerson
-                    start = perf_counter()
-                    executer_ford_fulkerson([row[:] for row in capacites], noms)
-                    t_ff = perf_counter() - start
-
-                    # Mesure de temps Push-Relabel
-                    start = perf_counter()
-                    executer_push_relabel([row[:] for row in capacites], noms)
-                    t_pr = perf_counter() - start
-
-                    # Mesure de temps Flot à coût minimal
                     sortie_s = sum(capacites[0])
                     entree_t = sum(capacites[i][n-1] for i in range(n))
                     val_flot = min(sortie_s, entree_t) // 2
-                    start = perf_counter()
-                    executer_flot_min_cout([row[:] for row in capacites], couts, noms, val_flot)
-                    t_min = perf_counter() - start
+
+                    t_ff, t_pr, t_min, flot_ff, flot_pr, flot_min = mesurer_temps_execution_algos(capacites, couts, noms, val_flot)
+
+                    print(f"\n📦 Flot envoyé :")
+                    print(f"Ford-Fulkerson   : {flot_ff}")
+                    print(f"Push-Relabel     : {flot_pr}")
+                    print(f"Flot à coût min  : {flot_min} (sur {val_flot} demandé)")
 
                     print(f"\n⏱️ Temps d’exécution :")
                     print(f"Ford-Fulkerson   : {t_ff:.4f} s")
                     print(f"Push-Relabel     : {t_pr:.4f} s")
                     print(f"Flot à coût min  : {t_min:.4f} s")
+
 
             except ValueError:
                 print("❌ Veuillez entrer un entier valide.")
