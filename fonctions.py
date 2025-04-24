@@ -278,130 +278,129 @@ def afficher_graphe_residuel_pondere(residuel, couts_residuel, noms):
 def afficher_table_bellman_detaillee(noms, etapes):
     print("\n=== Table de Bellman complète ===")
     table = []
-    for k, (distances, parents) in enumerate(etapes):
+
+    n = len(noms)
+    for k in range(len(etapes) + 1):
         ligne = [str(k)]
-        for i in range(len(noms)):
-            if distances[i] == float('inf'):
-                val = "+∞"
-            else:
-                parent = parents[i]
-                if parent == -1:
+        if k == 0:
+            # Affichage initial
+            for i in range(n):
+                if i == 0:
+                    ligne.append("0")  # s
+                else:
+                    ligne.append("+∞")
+        else:
+            distances, parents = etapes[k - 1]
+            for i in range(n):
+                if distances[i] == float('inf'):
+                    val = "+∞"
+                elif parents[i] == -1:
                     val = str(distances[i])
                 else:
-                    val = f"{distances[i]}{noms[parent].lower()}"
-            ligne.append(val)
+                    val = f"{distances[i]}({noms[parents[i]]})"
+                ligne.append(val)
         table.append(ligne)
+
     print(tabulate(table, headers=["k"] + noms, tablefmt="fancy_grid"))
+
+
 
 # ------------------------------#
 # Flot à coût minimal           #
 # ------------------------------#
 
-def bellman_ford(capacite, couts, source):
-    n = len(couts)
-    min_cout = [float('inf')] * n
-    parent = [-1] * n
-    min_cout[source] = 0
-    etapes = [(min_cout[:], parent[:])]
-
-    for k in range(n - 1):
-        changement = False
-        nouv_cout = min_cout[:]
-        nouv_parent = parent[:]
-
-        for v in range(n):  # Pour chaque sommet destination
-            for u in range(n):  # Tous les prédécesseurs
-                if capacite[u][v] > 0 and min_cout[u] + couts[u][v] < nouv_cout[v]:
-                    nouv_cout[v] = min_cout[u] + couts[u][v]
-                    nouv_parent[v] = u
-                    changement = True
-
-        min_cout = nouv_cout
-        parent = nouv_parent
-        etapes.append((min_cout[:], parent[:]))
-
-        # Arrêt anticipé si aucun changement détecté
-        if not changement:
-            break
-
-    return min_cout, parent, etapes
-
-def flot_min_cout(capacites, couts, noms, source, puits, val_flot):
-    n = len(couts)
-    residuel = [row[:] for row in capacites]
-    couts_residuel = [row[:] for row in couts]
+def executer_flot_min_cout(capacites, couts, noms, val_flot):
+    n = len(capacites)
+    source = 0
+    puits = n - 1
     flot_total = 0
     cout_total = 0
 
-    for u in range(n):
-        for v in range(n):
-            if capacites[u][v] > 0:
-                couts_residuel[v][u] = -couts[u][v]
+    residuel = [row[:] for row in capacites]
+    couts_residuel = [row[:] for row in couts]
 
     iteration = 1
-    while True:
-        cout_min, parents, etapes = bellman_ford(residuel, couts_residuel, source)
-        print(f"\n📘 Itération {iteration}")
+    print("\n🚀 Démarrage de l'algorithme de flot à coût minimal...")
+
+    while flot_total < val_flot:
+        # --- Bellman-Ford sur le graphe résiduel pondéré ---
+        distances = [float('inf')] * n
+        parents = [-1] * n
+        distances[source] = 0
+        etapes = []
+
+        for _ in range(n - 1):
+            new_distances = distances[:]
+            new_parents = parents[:]
+
+            for u in range(n):
+                for v in range(n):
+                    if residuel[u][v] > 0:
+                        if distances[u] + couts_residuel[u][v] < new_distances[v]:
+                            new_distances[v] = distances[u] + couts_residuel[u][v]
+                            new_parents[v] = u
+
+            etapes.append((new_distances[:], new_parents[:]))
+
+            # 💡 Stop si aucune modification
+            if new_distances == distances:
+                break
+
+            distances = new_distances
+            parents = new_parents
+
+
+
         afficher_table_bellman_detaillee(noms, etapes)
 
-        if cout_min[puits] == float('inf'):
-            print("\n❌ Aucun chemin améliorant trouvé, arrêt.")
+        if distances[puits] == float('inf'):
+            print("\n❌ Aucun chemin de coût minimal disponible. Arrêt.")
             break
 
+        # --- Reconstruire le chemin ---
         chemin = []
         v = puits
-        flot = float('inf')
         while v != source:
             u = parents[v]
             chemin.append((u, v))
-            flot = min(flot, residuel[u][v])
             v = u
         chemin.reverse()
         chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
+        print(f"\n ➡️ Chaîne améliorante de coût minimal trouvée : {chemin_str}")
 
-        print(f"\n✔️ Chaîne améliorante détectée : {chemin_str} de flot {flot}")
+        # --- Déterminer flot possible ---
+        flot_augmentable = min(residuel[u][v] for u, v in chemin)
+        flot_envoye = min(flot_augmentable, val_flot - flot_total)
+        cout_chaine = sum(couts_residuel[u][v] for u, v in chemin)
 
-        if val_flot is not None and flot_total + flot > val_flot:
-            flot = val_flot - flot_total
-            print(f"🎯 Ajustement du flot : nouveau flot = {flot}")
+        print(f" Flot envoyé dans cette chaîne : {flot_envoye}")
+        print(f" Coût unitaire de la chaîne : {cout_chaine}")
 
-        v = puits
-        while v != source:
-            u = parents[v]
-            residuel[u][v] -= flot
-            residuel[v][u] += flot
-            v = u
+        # --- Mise à jour des graphes résiduels ---
+        for u, v in chemin:
+            residuel[u][v] -= flot_envoye
+            residuel[v][u] += flot_envoye
+            couts_residuel[v][u] = -couts_residuel[u][v]
 
+        flot_total += flot_envoye
+        cout_total += flot_envoye * cout_chaine
+
+        print("\n --> Graphe résiduel pondéré mis à jour :")
         afficher_graphe_residuel_pondere(residuel, couts_residuel, noms)
 
-        flot_total += flot
-        cout_total += flot * cout_min[puits]
-
-        if val_flot is not None and flot_total >= val_flot:
-            print(f"\n🎯 Valeur cible de flot {val_flot} atteinte.")
-            break
+        print(f"📦 Flot total envoyé : {flot_total} / {val_flot}")
+        print(f"💸 Coût total accumulé : {cout_total}\n")
 
         iteration += 1
 
-    print(f"\n★ Flot total = {flot_total}, Coût total = {cout_total}")
-    matrice_flot = [[0] * n for _ in range(n)]
-    for u in range(n):
-        for v in range(n):
-            if capacites[u][v] > 0:
-                matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
-            else:
-                matrice_flot[u][v] = "0"
-
-    afficher_matrice("Flot final", matrice_flot, noms)
-    return flot_total, cout_total
-
-def executer_flot_min_cout(capacites, couts, noms, val_flot):
-    source = 0
-    puits = len(capacites) - 1
-    print("\n🔧 Résolution du flot à coût minimal :")
-    flot_min_cout(capacites, couts, noms, source, puits, val_flot)
+    print("\n✅ Algorithme terminé.")
+    print(f" Flot total envoyé : {flot_total}")
+    print(f" Coût total du flot : {cout_total}")
 
 
+# ------------------------------#
+# Complexité                    #
+# ------------------------------#
 def generer_graphe_flots(n):
     # Initialiser matrices C et D pleines de 0
     capacites = [[0 for i in range(n)] for j in range(n)]
