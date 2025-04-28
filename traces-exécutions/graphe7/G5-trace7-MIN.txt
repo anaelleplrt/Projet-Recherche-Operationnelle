@@ -38,6 +38,19 @@ Capacité maximale sortante de s : 18
 Capacité maximale entrante dans t : 18
 ✅ Choix automatique de la valeur de flot : 18 (valeur maximale possible)
 
+=== Table de Bellman complète ===
+╒═════╤═════╤══════╤══════╤══════╤══════╤══════╕
+│   k │   s │ a    │ b    │ c    │ d    │ t    │
+╞═════╪═════╪══════╪══════╪══════╪══════╪══════╡
+│   0 │   0 │ +∞   │ +∞   │ +∞   │ +∞   │ +∞   │
+├─────┼─────┼──────┼──────┼──────┼──────┼──────┤
+│   1 │   0 │ 4(s) │ +∞   │ 2(s) │ 4(s) │ +∞   │
+├─────┼─────┼──────┼──────┼──────┼──────┼──────┤
+│   2 │   0 │ 4(s) │ 6(a) │ 2(s) │ 4(s) │ 6(d) │
+├─────┼─────┼──────┼──────┼──────┼──────┼──────┤
+│   3 │   0 │ 4(s) │ 6(a) │ 2(s) │ 4(s) │ 6(d) │
+╘═════╧═════╧══════╧══════╧══════╧══════╧══════╛
+
 🚀 Démarrage de l'algorithme de flot à coût minimal...
 
 === Table de Bellman complète ===
@@ -53,7 +66,7 @@ Capacité maximale entrante dans t : 18
 │   3 │   0 │ 4(s) │ 6(a) │ 2(s) │ 4(s) │ 6(d) │
 ╘═════╧═════╧══════╧══════╧══════╧══════╧══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sdt
+➡️ Chaîne améliorante de coût minimal trouvée : sdt
  Flot envoyé dans cette chaîne : 1
  Coût unitaire de la chaîne : 6
 
@@ -92,7 +105,7 @@ Capacité maximale entrante dans t : 18
 │   3 │   0 │ 4(s) │ 6(a) │ 2(s) │ 4(s) │ 7(a) │
 ╘═════╧═════╧══════╧══════╧══════╧══════╧══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sat
+➡️ Chaîne améliorante de coût minimal trouvée : sat
  Flot envoyé dans cette chaîne : 5
  Coût unitaire de la chaîne : 7
 
@@ -135,7 +148,7 @@ Capacité maximale entrante dans t : 18
 │   5 │   0 │ 5(t) │ 7(a) │ 2(s) │ 4(s) │ 8(c) │
 ╘═════╧═════╧══════╧══════╧══════╧══════╧══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sct
+➡️ Chaîne améliorante de coût minimal trouvée : sct
  Flot envoyé dans cette chaîne : 8
  Coût unitaire de la chaîne : 8
 
@@ -178,7 +191,7 @@ Capacité maximale entrante dans t : 18
 │   5 │   0 │ 9(t)  │ 11(a) │ 6(d) │ 4(s) │ 12(c) │
 ╘═════╧═════╧═══════╧═══════╧══════╧══════╧═══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sdct
+➡️ Chaîne améliorante de coût minimal trouvée : sdct
  Flot envoyé dans cette chaîne : 1
  Coût unitaire de la chaîne : 12
 
@@ -221,7 +234,7 @@ Capacité maximale entrante dans t : 18
 │   5 │   0 │ 10(c) │ 12(a) │ 6(d) │ 4(s) │ 13(a) │
 ╘═════╧═════╧═══════╧═══════╧══════╧══════╧═══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sdcat
+➡️ Chaîne améliorante de coût minimal trouvée : sdcat
  Flot envoyé dans cette chaîne : 2
  Coût unitaire de la chaîne : 13
 
@@ -264,7 +277,7 @@ Capacité maximale entrante dans t : 18
 │   5 │   0 │ 10(c) │ 12(a) │ 6(d) │ 4(s) │ 15(b) │
 ╘═════╧═════╧═══════╧═══════╧══════╧══════╧═══════╛
 
- ➡️ Chaîne améliorante de coût minimal trouvée : sdcabt
+➡️ Chaîne améliorante de coût minimal trouvée : sdcabt
  Flot envoyé dans cette chaîne : 1
  Coût unitaire de la chaîne : 15
 
