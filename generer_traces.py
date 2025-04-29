@@ -1,16 +1,8 @@
 import os
 from contextlib import redirect_stdout
-from fonctions import (
-    lire_graphe,
-    get_noms_sommets,
-    afficher_matrice,
-    executer_ford_fulkerson,
-    executer_push_relabel,
-    est_flot_a_cout_min,
-    executer_flot_min_cout 
-)
+from fonctions import *
 
-GROUPE = "G2"
+GROUPE = "G5"
 DOSSIER_BASE = "traces-exécutions"
 os.makedirs(DOSSIER_BASE, exist_ok=True)
 
@@ -59,7 +51,36 @@ def generer_trace(graphe_num):
                 print(f"\nCapacité maximale sortante de s : {sortie_s}")
                 print(f"Capacité maximale entrante dans t : {entree_t}")
                 print(f"✅ Choix automatique de la valeur de flot : {val_flot} (valeur maximale possible)")
+
+                # === Afficher la table de Bellman initiale ===
+                residuel = [row[:] for row in capacites]
+                couts_residuel = [row[:] for row in couts]
+
+                n = len(capacites)
+                distances = [float('inf')] * n
+                parents = [-1] * n
+                distances[0] = 0
+                etapes = []
+
+                for _ in range(n - 1):
+                    new_distances = distances[:]
+                    new_parents = parents[:]
+                    for u in range(n):
+                        for v in range(n):
+                            if residuel[u][v] > 0 and distances[u] + couts_residuel[u][v] < new_distances[v]:
+                                new_distances[v] = distances[u] + couts_residuel[u][v]
+                                new_parents[v] = u
+                    etapes.append((new_distances[:], new_parents[:]))
+                    if new_distances == distances:
+                        break
+                    distances = new_distances
+                    parents = new_parents
+
+                afficher_table_bellman_detaillee(noms, etapes)
+
+                # === Lancer l'algorithme de flot à coût minimal ===
                 executer_flot_min_cout(capacites, couts, noms, val_flot)
+
 
 
 

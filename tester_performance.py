@@ -1,5 +1,6 @@
 from fonctions import generer_graphe_aleatoire, get_noms_sommets, mesurer_temps_execution_algos
 import csv
+from tabulate import tabulate
 
 def tester_n_valeurs(n):
     print(f"\n🚀 Lancement des 100 tests pour n = {n}")
