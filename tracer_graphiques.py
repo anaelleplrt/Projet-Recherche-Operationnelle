@@ -93,6 +93,3 @@ plt.tight_layout()
 plt.savefig("./graphiques/ratio_ff_pr.png", dpi=300)
 plt.close()
 print(f"✅ Graphe ratio_ff_pr.png sauvegardé")
-
-
-print(temps_max)
