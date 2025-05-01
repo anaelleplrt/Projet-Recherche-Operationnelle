@@ -8,7 +8,7 @@ valeurs_n = [10, 20, 40, 100, 200, 400, 1000]
 
 donnees = {
     "FF": {"n": [], "temps": [], "couleur": "blue", "titre": "Ford-Fulkerson"},
-    "PR": {"n": [], "temps": [], "couleur": "orange", "titre": "Pousser-Reétiqueter"},
+    "PR": {"n": [], "temps": [], "couleur": "orange", "titre": "Push-Relabel"},
     "MIN": {"n": [], "temps": [], "couleur": "green", "titre": "Flot à coût min"}
 }
 
@@ -55,7 +55,6 @@ for code, d in donnees.items():
     plt.ylabel("Temps d'exécution (secondes)", fontsize=12)
     plt.grid(True, which='both', linestyle='--', alpha=0.5)
     plt.xscale("log")
-    plt.yscale("log")
     plt.gca().xaxis.set_major_formatter(ScalarFormatter())
     plt.xticks(valeurs_n, labels=[str(n) for n in valeurs_n])
     plt.scatter(d["n"], d["temps"], color=d["couleur"], s=14, alpha=0.6, edgecolors='k', linewidths=0.3)
@@ -82,7 +81,7 @@ for code in ["FF", "PR", "MIN"]:
 
 # Graphe des ratios FF/PR
 plt.figure(figsize=(10, 6))
-plt.title("Ratio des temps max Ford-Fulkerson / Pousser-Réetiqueter", fontsize=14)
+plt.title("Ratio des temps max Ford-Fulkerson / Push-Relabel", fontsize=14)
 plt.plot(valeurs_n, ratios_ff_pr, marker='o', linestyle='-', color='purple')
 plt.xscale("log")
 plt.gca().xaxis.set_major_formatter(ScalarFormatter())
