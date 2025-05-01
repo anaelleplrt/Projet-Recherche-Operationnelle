@@ -36,14 +36,15 @@ def afficher_matrice(nom, matrice, noms_sommets=None):
     nb_sommets = len(matrice)
 
     if noms_sommets is None:
-        get_noms_sommets(nb_sommets)
+        noms_sommets = get_noms_sommets(nb_sommets)
+
 
     print(f"\n=== {nom} ===")
     print(tabulate(matrice, headers=noms_sommets, showindex=noms_sommets, tablefmt="fancy_grid"))
 
 
 
-# Fonction principale de traitement du graphe
+# Fonction principale de traitement du graphe appelée dans le menu
 
 def traiter_graphe(numero):
     chemin = f"graphes-tests/graphe{numero}.txt"
@@ -327,8 +328,6 @@ def executer_push_relabel(capacites, noms, afficher=True):
 # ------------------------------#
 # Algorithme Bellman-Ford       #
 # ------------------------------#
-
-
 
 
 # ------------------------------#
