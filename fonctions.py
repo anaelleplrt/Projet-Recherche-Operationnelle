@@ -173,7 +173,7 @@ def ford_fulkerson(capacites, source, puits, noms, afficher=True):
     flot_max = 0
     iteration = 1
 
-    while bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=afficher):
+    while bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=afficher): # O(F * n)
         chemin = []
         v = puits
         flot = float('inf')
