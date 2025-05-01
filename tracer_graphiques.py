@@ -55,6 +55,7 @@ for code, d in donnees.items():
     plt.ylabel("Temps d'exécution (secondes)", fontsize=12)
     plt.grid(True, which='both', linestyle='--', alpha=0.5)
     plt.xscale("log")
+    plt.yscale("log")
     plt.gca().xaxis.set_major_formatter(ScalarFormatter())
     plt.xticks(valeurs_n, labels=[str(n) for n in valeurs_n])
     plt.scatter(d["n"], d["temps"], color=d["couleur"], s=14, alpha=0.6, edgecolors='k', linewidths=0.3)
