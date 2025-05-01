@@ -8,7 +8,7 @@ valeurs_n = [10, 20, 40, 100, 200, 400, 1000]
 
 donnees = {
     "FF": {"n": [], "temps": [], "couleur": "blue", "titre": "Ford-Fulkerson"},
-    "PR": {"n": [], "temps": [], "couleur": "orange", "titre": "Push-Relabel"},
+    "PR": {"n": [], "temps": [], "couleur": "orange", "titre": "Pousser-Reétiqueter"},
     "MIN": {"n": [], "temps": [], "couleur": "green", "titre": "Flot à coût min"}
 }
 
@@ -81,7 +81,7 @@ for code in ["FF", "PR", "MIN"]:
 
 # Graphe des ratios FF/PR
 plt.figure(figsize=(10, 6))
-plt.title("Ratio des temps max Ford-Fulkerson / Push-Relabel", fontsize=14)
+plt.title("Ratio des temps max Ford-Fulkerson / Pousser-Réetiqueter", fontsize=14)
 plt.plot(valeurs_n, ratios_ff_pr, marker='o', linestyle='-', color='purple')
 plt.xscale("log")
 plt.gca().xaxis.set_major_formatter(ScalarFormatter())
@@ -93,3 +93,6 @@ plt.tight_layout()
 plt.savefig("./graphiques/ratio_ff_pr.png", dpi=300)
 plt.close()
 print(f"✅ Graphe ratio_ff_pr.png sauvegardé")
+
+
+print(temps_max)
