@@ -116,19 +116,19 @@ def ford_fulkerson(capacites, source, puits, noms, afficher=True):
         chemin = []
         v = puits
         flot = float('inf')
-        while v != source:
+        while v != source: # O(n)
             u = parent[v]
             chemin.append((u, v))
             flot = min(flot, residuel[u][v])
             v = u
-        chemin.reverse()
+        chemin.reverse() #O(n)
         chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
 
         if afficher:
             print(f"\nDétection d’une chaîne améliorante : {chemin_str} de flot {flot}")
 
         v = puits
-        while v != source:
+        while v != source: #O(n)
             u = parent[v]
             residuel[u][v] -= flot
             residuel[v][u] += flot
@@ -174,13 +174,13 @@ def push_relabel(capacites, noms, afficher=True):
     source = 0
     puits = n - 1
 
-    hauteur = [0] * n
-    exces = [0] * n
-    residuel = [row[:] for row in capacites]
+    hauteur = [0] * n # O(n)
+    exces = [0] * n # O(n)
+    residuel = [row[:] for row in capacites] #  O(n * n)
 
     # Initialisation
     hauteur[source] = n
-    for v in range(n):
+    for v in range(n):      #O(n)
         if residuel[source][v] > 0:
             flot = residuel[source][v]
             residuel[source][v] -= flot
@@ -199,9 +199,9 @@ def push_relabel(capacites, noms, afficher=True):
 
     def relabel(u):
         min_h = float('inf')
-        for v in range(n):
+        for v in range(n): # O(n)
             if residuel[u][v] > 0:
-                min_h = min(min_h, hauteur[v])
+                min_h = min(min_h, hauteur[v]) 
         if min_h < float('inf'):
             if afficher:
                 print(f"⤴️ Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
@@ -215,31 +215,31 @@ def push_relabel(capacites, noms, afficher=True):
             afficher_matrice("Graphe résiduel", residuel, noms)
 
     def choisir_sommet_actif():
-        candidats = [(hauteur[i], noms[i], i) for i in range(n) if i != source and i != puits and exces[i] > 0]
+        candidats = [(hauteur[i], noms[i], i) for i in range(n) if i != source and i != puits and exces[i] > 0] # O(n)
         if not candidats:
             return None
-        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2]
+        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2] # O(n) + O(nlog(n))
 
     if afficher:
         print("\n🔧 Résolution avec Push-Relabel :")
     iteration = 1
     afficher_etat(iteration)
 
-    while True:
-        u = choisir_sommet_actif()
+    while True: #O(n)
+        u = choisir_sommet_actif() # O(n) + O(n) + O(nlog(n))
         if u is None:
             break
 
         pushed = False
-        voisins = sorted([v for v in range(n) if residuel[u][v] > 0], key=lambda x: (noms[x] != noms[puits], noms[x]))
-        for v in voisins:
+        voisins = sorted([v for v in range(n) if residuel[u][v] > 0], key=lambda x: (noms[x] != noms[puits], noms[x])) # O(n) + O(nlog(n))
+        for v in voisins: #O(n)
             if residuel[u][v] > 0 and hauteur[u] == hauteur[v] + 1:
                 push(u, v)
                 afficher_etat(iteration)
                 pushed = True
                 break
         if not pushed:
-            relabel(u)
+            relabel(u) # O(n)
             afficher_etat(iteration)
 
         iteration += 1
@@ -331,20 +331,20 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
     flot_total = 0
     cout_total = 0
 
-    residuel = [row[:] for row in capacites]
-    couts_residuel = [row[:] for row in couts]
+    residuel = [row[:] for row in capacites] #O(n * n)
+    couts_residuel = [row[:] for row in couts] # O ( n * n )
 
     iteration = 1
     if afficher:
         print("\n🚀 Démarrage de l'algorithme de flot à coût minimal...")
 
-    while flot_total < val_flot:
-        distances = [float('inf')] * n
-        parents = [-1] * n
+    while flot_total < val_flot: # o(F)
+        distances = [float('inf')] * n # O(n)
+        parents = [-1] * n # O(n)
         distances[source] = 0
         etapes = []
 
-        for _ in range(n - 1):
+        for _ in range(n - 1): #O (n**3)
             new_distances = distances[:]
             new_parents = parents[:]
             for u in range(n):
@@ -368,25 +368,25 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
 
         chemin = []
         v = puits
-        while v != source:
+        while v != source: #O(n)
             u = parents[v]
             chemin.append((u, v))
             v = u
-        chemin.reverse()
+        chemin.reverse() # O(n)
 
         if afficher:
             chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
             print(f"\n➡️ Chaîne améliorante de coût minimal trouvée : {chemin_str}")
 
-        flot_augmentable = min(residuel[u][v] for u, v in chemin)
-        flot_envoye = min(flot_augmentable, val_flot - flot_total)
-        cout_chaine = sum(couts_residuel[u][v] for u, v in chemin)
+        flot_augmentable = min(residuel[u][v] for u, v in chemin) # O(n)
+        flot_envoye = min(flot_augmentable, val_flot - flot_total) # O(n)
+        cout_chaine = sum(couts_residuel[u][v] for u, v in chemin) # O(n)
 
         if afficher:
             print(f" Flot envoyé dans cette chaîne : {flot_envoye}")
             print(f" Coût unitaire de la chaîne : {cout_chaine}")
 
-        for u, v in chemin:
+        for u, v in chemin: # O(n)
             residuel[u][v] -= flot_envoye
             residuel[v][u] += flot_envoye
             couts_residuel[v][u] = -couts_residuel[u][v]
