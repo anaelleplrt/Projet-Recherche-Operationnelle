@@ -22,11 +22,11 @@ Ce projet vise à résoudre des problèmes de flots sur des graphes à l'aide de
 | **reader.py**              | Lit les graphes depuis les fichiers `.txt`. |
 | **generer_traces.py**      | Génère automatiquement les fichiers de **traces d'exécution** pour les 10 graphes fournis (graphes-tests). |
 | **tester_performance.py**  | Effectue **100 tests** sur un `n` donné, mesure les temps d'exécution des 3 algorithmes et stocke les résultats dans un fichier `.csv`. |
-| **tracer_graphiques.py**   | Génère des **nuages de points** pour visualiser le temps d'exécution des algorithmes en fonction de la taille des graphes (`n`). |
+| **tracer_graphiques.py**   | Génère automatiquement les graphiques (nuages de points, enveloppes supérieures et ratios) à partir des fichiers CSV de résultats pour analyser la complexité empirique des algorithmes.. |
 | **graphes-tests/**         | Contient les 10 fichiers `.txt` représentant les graphes à analyser. |
 | **traces-exécutions/**     | Dossier généré automatiquement contenant toutes les **traces d'exécution** pour les graphes 1 à 10. |
 | **resultats_nX.csv**       | Fichiers générés lors des tests de performance pour différentes tailles `n`. |
-| **nuage_FF.png / nuage_PR.png / nuage_MIN.png** | Graphiques générés à partir des résultats de performances. |
+| **graphiques/** | Dossier contenant les graphes liés à la complexité. |
 
 ---
 
@@ -56,12 +56,14 @@ python tester_performance.py
 - Entrez la taille n du graphe (ex : 10, 50, 100, etc.).
 - Le script exécute les 3 algorithmes 100 fois et enregistre les résultats dans resultats_nX.csv.
 
-### 4. Tracer les nuages de points
+### 4. Tracer les différents graphiques liés à la compléxité
 ```bash
 python tracer_graphiques.py
 ```
 - Lit les fichiers .csv de performances.
-- Génére des nuages de points pour Ford-Fulkerson, Push-Relabel et Flot à coût minimal (nuage_FF.png, nuage_PR.png, nuage_MIN.png).
+- Génère des nuages de points pour Ford-Fulkerson, Push-Relabel et Flot à coût minimal (nuage_FF.png, nuage_PR.png, nuage_MIN.png).
+- Génère les Enveloppes supérieures des 3 algos (enveloppe_FF.png, etc.)
+- Génère la courbe correspondant au ratio FF / PR (ratio_ff_pr.png)
 
 
 
