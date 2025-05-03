@@ -220,7 +220,7 @@ def executer_ford_fulkerson(capacites, noms, afficher=True):
     source = 0
     puits = len(capacites) - 1
     if afficher:
-        print("\n🔧 Résolution avec Ford-Fulkerson :")
+        print("\n Résolution avec Ford-Fulkerson :")
     return ford_fulkerson(capacites, source, puits, noms, afficher=afficher)
 
 
@@ -256,7 +256,7 @@ def push_relabel(capacites, noms, afficher=True):
         exces[u] -= delta
         exces[v] += delta
         if afficher:
-            print(f"🔄 Push : {noms[u]} → {noms[v]} (Δ = {delta})")
+            print(f"--> Push : {noms[u]} → {noms[v]} (Δ = {delta})")
 
     def relabel(u):
         min_h = float('inf')
@@ -265,7 +265,7 @@ def push_relabel(capacites, noms, afficher=True):
                 min_h = min(min_h, hauteur[v]) 
         if min_h < float('inf'):
             if afficher:
-                print(f"⤴️ Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
+                print(f"⤴  Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
             hauteur[u] = min_h + 1
 
     def afficher_etat(iteration):
@@ -282,7 +282,7 @@ def push_relabel(capacites, noms, afficher=True):
         return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2] # O(n) + O(nlog(n))
 
     if afficher:
-        print("\n🔧 Résolution avec Push-Relabel :")
+        print("\n Résolution avec Push-Relabel :")
     iteration = 1
     afficher_etat(iteration)
 
@@ -315,7 +315,7 @@ def push_relabel(capacites, noms, afficher=True):
                 else:
                     matrice_flot[u][v] = "0"
         afficher_matrice("Flot maximum", matrice_flot, noms)
-        print(f"\n✅ Flot maximum total = {exces[puits]}")
+        print(f"\n --> Flot maximum total = {exces[puits]}")
 
     return exces[puits]
 
@@ -395,7 +395,7 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
 
     iteration = 1
     if afficher:
-        print("\n🚀 Démarrage de l'algorithme de flot à coût minimal...")
+        print("\n Démarrage de l'algorithme de flot à coût minimal...")
 
     while flot_total < val_flot: # o(F)
         distances = [float('inf')] * n # O(n)
@@ -422,7 +422,7 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
 
         if distances[puits] == float('inf'):
             if afficher:
-                print("\n❌ Aucun chemin de coût minimal disponible. Arrêt.")
+                print("\n --> Aucun chemin de coût minimal disponible. Arrêt.")
             break
 
         chemin = []
@@ -435,7 +435,7 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
 
         if afficher:
             chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
-            print(f"\n➡️ Chaîne améliorante de coût minimal trouvée : {chemin_str}")
+            print(f"\n --> Chaîne améliorante de coût minimal trouvée : {chemin_str}")
 
         flot_augmentable = min(residuel[u][v] for u, v in chemin) # O(n)
         flot_envoye = min(flot_augmentable, val_flot - flot_total) # O(n)
@@ -456,13 +456,13 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
         if afficher:
             print("\n --> Graphe résiduel pondéré mis à jour :")
             afficher_graphe_residuel_pondere(residuel, couts_residuel, noms)
-            print(f"📦 Flot total envoyé : {flot_total} / {val_flot}")
-            print(f"💸 Coût total accumulé : {cout_total}\n")
+            print(f"--> Flot total envoyé : {flot_total} / {val_flot}")
+            print(f"--> Coût total accumulé : {cout_total}\n")
 
         iteration += 1
 
     if afficher:
-        print("\n✅ Algorithme terminé.")
+        print("\n--> Algorithme terminé.")
         print(f" Flot total envoyé : {flot_total}")
         print(f" Coût total du flot : {cout_total}")
 

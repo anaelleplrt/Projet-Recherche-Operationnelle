@@ -3,7 +3,7 @@ import csv
 from tabulate import tabulate
 
 def tester_n_valeurs(n):
-    print(f"\n🚀 Lancement des 100 tests pour n = {n}")
+    print(f"\n Lancement des 100 tests pour n = {n}")
     fichier_csv = f"resultats_n{n}.csv"
 
     with open(fichier_csv, mode='w', newline='') as f:
