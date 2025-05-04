@@ -29,17 +29,21 @@ def est_flot_a_cout_min(numero):
 # ------------------------
 
 def afficher_matrice(nom, matrice, noms_sommets=None):
+    #si la matrice est vide, on affiche un message et on arrête
     if matrice is None:
         print("Aucune donnée.")
         return
 
+    #on récupère le nombre de sommets (taille de la matrice)
     nb_sommets = len(matrice)
 
+    #si aucun nom n'est donné, on les génère automatiquement
     if noms_sommets is None:
         noms_sommets = get_noms_sommets(nb_sommets)
 
-
     print(f"\n=== {nom} ===")
+
+    #on affiche la matrice proprement grace a tabulate
     print(tabulate(matrice, headers=noms_sommets, showindex=noms_sommets, tablefmt="fancy_grid"))
 
 
@@ -83,7 +87,7 @@ def traiter_graphe(numero):
 
         afficher_table_bellman_detaillee(noms, etapes)
 
-        # Flot max autorisé
+        # indique au user le flot max autorisé
         source = 0
         sortie_s = sum(capacites[source])
         entree_t = sum(capacites[i][n-1] for i in range(n))
@@ -127,43 +131,48 @@ def traiter_graphe(numero):
 
 #Parcours en largeur
 def bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=True):
-    n = len(capacites)
-    visited = [False] * n
-    queue = deque()
-    queue.append(source)
-    visited[source] = True
+    n = len(capacites)  #nombre de sommets
+    visited = [False] * n  #liste pour savoir si un sommet a été visité
+
+    visited[source] = True  #on commence par marquer la source comme visitée
 
     if afficher:
         print(f"\n★ Itération {iteration} :")
         print("Le parcours en largeur :")
         print(noms[source])
 
-    niveaux = [[source]]  # liste des sommets par niveau
-    level = 0
+    niveaux = [[source]]  #liste des niveaux (pour affichage) → niveau 0 = source
+    level = 0  #niveau actuel
 
-    while niveaux[level]:
-        next_level = []
-        ligne_sommets = []
-        ligne_parents = []
-        for u in niveaux[level]:
-            for v in range(n):
-                if not visited[v] and residuel[u][v] > 0:
-                    parent[v] = u
+    while niveaux[level]:  #tant qu’il y a des sommets à ce niveau
+        next_level = []  #liste des sommets du niveau suivant
+        ligne_sommets = []  #pour afficher les noms des sommets explorés à ce niveau
+        ligne_parents = []  #pour afficher les parents associés
+
+        for u in niveaux[level]:  #pour chaque sommet du niveau actuel
+            for v in range(n):  #on regarde ses voisins
+                if not visited[v] and residuel[u][v] > 0:  #si voisin non visité et capacité > 0
+                    parent[v] = u  #on enregistre le parent de v
                     visited[v] = True
-                    next_level.append(v)
+                    next_level.append(v)  #on ajoute ce voisin au niveau suivant
                     ligne_sommets.append(noms[v])
-                    ligne_parents.append(f"Π({noms[v]}) = {noms[u]}")
-                    if v == puits:
+                    ligne_parents.append(f"Π({noms[v]}) = {noms[u]}")  #notation π(v) = u
+
+                    if v == puits:  #si on a atteint le puits, on peut s’arrêter
                         niveaux.append(next_level)
                         if afficher:
                             print("".join(ligne_sommets) + " ; " + " ; ".join(ligne_parents))
-                        return True
+                        return True  #un chemin de s à t a été trouvé
+
+        #affichage intermédiaire du niveau courant
         if ligne_sommets and afficher:
             print("".join(ligne_sommets) + " ; " + " ; ".join(ligne_parents))
-        niveaux.append(next_level)
+
+        niveaux.append(next_level)  #on passe au niveau suivant
         level += 1
 
-    return False
+    return False  #aucun chemin trouvé de s à t
+
 
 
 def ford_fulkerson(capacites, source, puits, noms, afficher=True):
@@ -173,23 +182,23 @@ def ford_fulkerson(capacites, source, puits, noms, afficher=True):
     flot_max = 0
     iteration = 1
 
-    while bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=afficher): # O(F**2?? * n)
+    while bfs(capacites, residuel, source, puits, parent, noms, iteration, afficher=afficher): 
         chemin = []
         v = puits
         flot = float('inf')
-        while v != source: # O(n)
+        while v != source: 
             u = parent[v]
             chemin.append((u, v))
             flot = min(flot, residuel[u][v])
             v = u
-        chemin.reverse() #O(n)
+        chemin.reverse() 
         chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
 
         if afficher:
             print(f"\nDétection d’une chaîne améliorante : {chemin_str} de flot {flot}")
 
         v = puits
-        while v != source: #O(n)
+        while v != source: 
             u = parent[v]
             residuel[u][v] -= flot
             residuel[v][u] += flot
@@ -232,25 +241,28 @@ def executer_ford_fulkerson(capacites, noms, afficher=True):
 
 def push_relabel(capacites, noms, afficher=True):
     n = len(capacites)
-    source = 0
+    s = 0
     puits = n - 1
 
-    hauteur = [0] * n # O(n)
-    exces = [0] * n # O(n)
-    residuel = [row[:] for row in capacites] #  O(n * n)
+    hauteur = [0] * n  #table des hauteurs de chaque sommet
+    exces = [0] * n    #table des excès de chaque sommet
+    residuel = [row[:] for row in capacites]  #copie de la matrice de capacités (graphe résiduel)
 
-    # Initialisation
-    hauteur[source] = n
-    for v in range(n):      #O(n)
-        if residuel[source][v] > 0:
-            flot = residuel[source][v]
-            residuel[source][v] -= flot
-            residuel[v][source] += flot
-            exces[v] += flot
-            exces[source] -= flot
+    #initialisation : la source a une hauteur = n
+    hauteur[s] = n
 
+    #pour chaque voisins v de n, on sature 
+    for v in range(n):      
+        if residuel[s][v] > 0:
+            flot = residuel[s][v]
+            residuel[s][v] -= flot  
+            residuel[v][s] += flot 
+            exces[v] += flot            
+            exces[s] -= flot       
+
+    #fonction pour effectuer un push de u vers v
     def push(u, v):
-        delta = min(exces[u], residuel[u][v])
+        delta = min(exces[u], residuel[u][v])  #on pousse le minimum entre l’excès de u et ce qu’on peut encore envoyer vers v
         residuel[u][v] -= delta
         residuel[v][u] += delta
         exces[u] -= delta
@@ -258,16 +270,21 @@ def push_relabel(capacites, noms, afficher=True):
         if afficher:
             print(f"--> Push : {noms[u]} → {noms[v]} (Δ = {delta})")
 
+    #fonction pour augmenter la hauteur de u (relabel)
     def relabel(u):
-        min_h = float('inf')
-        for v in range(n): # O(n)
-            if residuel[u][v] > 0:
-                min_h = min(min_h, hauteur[v]) 
-        if min_h < float('inf'):
+        min_h = float('inf')  #on initialise min_h à l'infini pour trouver la plus petite hauteur accessible
+
+        for v in range(n):  #on parcourt tous les voisins v de u
+            if residuel[u][v] > 0:  #s'il reste de la capacité de u vers v
+                min_h = min(min_h, hauteur[v])  #on garde la plus petite hauteur parmi les voisins accessibles
+
+        if min_h < float('inf'):  #si u peut pousser vers au moins un voisin
             if afficher:
                 print(f"⤴  Relabel : {noms[u]} (hauteur {hauteur[u]} → {min_h + 1})")
-            hauteur[u] = min_h + 1
+            hauteur[u] = min_h + 1  #on augmente la hauteur de u juste au-dessus de celle de v
 
+    
+    #affichage de l'état actuel : hauteur, excès et graphe résiduel
     def afficher_etat(iteration):
         if afficher:
             print(f"\n★ Itération {iteration} :")
@@ -275,45 +292,61 @@ def push_relabel(capacites, noms, afficher=True):
             print("Excès   :", {noms[i]: e for i, e in enumerate(exces)})
             afficher_matrice("Graphe résiduel", residuel, noms)
 
+    #fonction pour choisir le prochain sommet actif à traiter
     def choisir_sommet_actif():
-        candidats = [(hauteur[i], noms[i], i) for i in range(n) if i != source and i != puits and exces[i] > 0] # O(n)
+        #on prend les sommets (hors s et t) qui ont un excès > 0
+        candidats = [(hauteur[i], noms[i], i) for i in range(n) if i != s and i != puits and exces[i] > 0]
         if not candidats:
-            return None
-        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2] # O(n) + O(nlog(n))
+            return None 
+        #on prend celui qui a la plus grande hauteur (ordre alphabétique en cas d'égalité)
+        return sorted(candidats, key=lambda x: (-x[0], x[1]))[0][2]
+    
 
+    #boucle principale de push-relabel 
     if afficher:
         print("\n Résolution avec Push-Relabel :")
     iteration = 1
-    afficher_etat(iteration)
+    afficher_etat(iteration) #afficher état initiale
 
-    while True: #O(n)
-        u = choisir_sommet_actif() # O(n) + O(n) + O(nlog(n))
+    
+    while True:
+        u = choisir_sommet_actif()  #choix du sommet actif à traiter
         if u is None:
-            break
+            break  #plus aucun sommet actif → on a terminé
 
-        pushed = False
-        voisins = sorted([v for v in range(n) if residuel[u][v] > 0], key=lambda x: (noms[x] != noms[puits], noms[x])) # O(n) + O(nlog(n))
-        for v in voisins: #O(n)
+        pushed = False  #pour savoir si un push a été fait
+
+        #on trie les voisins de u : on pousse vers t en priorité, puis par ordre alphabétique
+        voisins = sorted([v for v in range(n) if residuel[u][v] > 0], key=lambda x: (noms[x] != noms[puits], noms[x])) 
+
+        for v in voisins:  #on essaie de pousser vers un voisin valide
             if residuel[u][v] > 0 and hauteur[u] == hauteur[v] + 1:
-                push(u, v)
+                push(u, v)  #on pousse si la condition de hauteur est respectée
                 afficher_etat(iteration)
                 pushed = True
                 break
-        if not pushed:
-            relabel(u) # O(n)
+
+        if not pushed: #si aucun push possible, on relabel u
+            relabel(u) 
             afficher_etat(iteration)
 
         iteration += 1
 
     if afficher:
         print("\n★ Affichage du flot max :")
+
+        #on crée une matrice vide pour afficher le flot final
         matrice_flot = [[0]*n for _ in range(n)]
         for u in range(n):
             for v in range(n):
                 if capacites[u][v] > 0:
+                    #on calcule le flot envoyé sur l’arête u→v : capacité initiale - capacité résiduelle et on l’affiche sous forme "flot/capacité"
                     matrice_flot[u][v] = f"{capacites[u][v] - residuel[u][v]}/{capacites[u][v]}"
                 else:
+                    #s’il n’y avait pas d’arête à la base, on affiche 0
                     matrice_flot[u][v] = "0"
+        
+        #affiche la matrice de flot final avec les noms de sommets + le flot max tot
         afficher_matrice("Flot maximum", matrice_flot, noms)
         print(f"\n --> Flot maximum total = {exces[puits]}")
 
@@ -335,15 +368,21 @@ def executer_push_relabel(capacites, noms, afficher=True):
 # ------------------------------#
 
 def afficher_graphe_residuel_pondere(residuel, couts_residuel, noms):
-    n = len(residuel)
+    n = len(residuel)  #nombre de sommets
+    #on crée une matrice vide de chaînes de caractères pour mélanger capacité et coût
     graphe_mixte = [["" for _ in range(n)] for _ in range(n)]
+
     for u in range(n):
         for v in range(n):
             if residuel[u][v] > 0:
+                #s’il reste de la capacité de u vers v, on affiche "capacité ; coût"
                 graphe_mixte[u][v] = f"{residuel[u][v]} ; {couts_residuel[u][v]}"
             else:
+                #sinon on met "0" pour dire qu’il n’y a pas d’arête résiduelle
                 graphe_mixte[u][v] = "0"
+
     afficher_matrice("Graphe résiduel pondéré (capacité ; coût)", graphe_mixte, noms)
+
 
 # ------------------------------#
 # Fonction Bellman détaillée    #
@@ -353,29 +392,34 @@ def afficher_table_bellman_detaillee(noms, etapes):
     print("\n=== Table de Bellman complète ===")
     table = []
 
-    n = len(noms)
-    for k in range(len(etapes) + 1):
-        ligne = [str(k)]
+    n = len(noms)  #nombre de sommets
+
+    for k in range(len(etapes) + 1):  #pour chaque itération k (de 0 à n)
+        ligne = [str(k)]  #on commence la ligne par le numéro d’itération
+
         if k == 0:
-            # Affichage initial
+            #affichage initial (avant la première mise à jour)
             for i in range(n):
                 if i == 0:
-                    ligne.append("0")  # s
+                    ligne.append("0")  #la source a une distance de 0
                 else:
-                    ligne.append("+∞")
+                    ligne.append("+∞")  #les autres sommets sont à l’infini au début
         else:
-            distances, parents = etapes[k - 1]
+            distances, parents = etapes[k - 1]  #on récupère les valeurs de l’étape k-1
             for i in range(n):
                 if distances[i] == float('inf'):
-                    val = "+∞"
+                    val = "+∞"  #si le sommet est toujours inaccessible
                 elif parents[i] == -1:
-                    val = str(distances[i])
+                    val = str(distances[i])  #pas de parent connu, juste la distance
                 else:
-                    val = f"{distances[i]}({noms[parents[i]]})"
+                    val = f"{distances[i]}({noms[parents[i]]})"  #on affiche la distance et le parent
                 ligne.append(val)
-        table.append(ligne)
 
+        table.append(ligne)  #on ajoute la ligne à la table
+
+    #affichage final de la table avec tabulate
     print(tabulate(table, headers=["k"] + noms, tablefmt="fancy_grid"))
+
 
 
 
@@ -390,20 +434,22 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
     flot_total = 0
     cout_total = 0
 
-    residuel = [row[:] for row in capacites] #O(n * n)
-    couts_residuel = [row[:] for row in couts] # O ( n * n )
+    residuel = [row[:] for row in capacites]  #copie du graphe pour le graphe résiduel
+    couts_residuel = [row[:] for row in couts]  #copie des coûts pour suivre les inverses
 
     iteration = 1
     if afficher:
         print("\n Démarrage de l'algorithme de flot à coût minimal...")
 
-    while flot_total < val_flot: # o(F)
-        distances = [float('inf')] * n # O(n)
-        parents = [-1] * n # O(n)
+    #tant qu’on n’a pas encore atteint le flot voulu
+    while flot_total < val_flot:
+        distances = [float('inf')] * n  #distances depuis la source
+        parents = [-1] * n  #parents pour reconstruire le chemin
         distances[source] = 0
-        etapes = []
+        etapes = []  #pour afficher les étapes de Bellman
 
-        for _ in range(n - 1): #O (n**3)
+        #algorithme de Bellman-Ford sur n-1 itérations
+        for _ in range(n - 1):
             new_distances = distances[:]
             new_parents = parents[:]
             for u in range(n):
@@ -413,42 +459,47 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
                         new_parents[v] = u
             etapes.append((new_distances[:], new_parents[:]))
             if new_distances == distances:
-                break
+                break  #plus aucune mise à jour
             distances = new_distances
             parents = new_parents
 
+        #affiche les étapes du Bellman si demandé
         if afficher:
             afficher_table_bellman_detaillee(noms, etapes)
 
+        #si on ne peut pas atteindre le puits
         if distances[puits] == float('inf'):
             if afficher:
                 print("\n --> Aucun chemin de coût minimal disponible. Arrêt.")
             break
 
+        #on reconstruit le chemin trouvé
         chemin = []
         v = puits
-        while v != source: #O(n)
+        while v != source:
             u = parents[v]
             chemin.append((u, v))
             v = u
-        chemin.reverse() # O(n)
+        chemin.reverse()
 
         if afficher:
             chemin_str = ''.join([noms[u] for u, _ in chemin] + [noms[chemin[-1][1]]])
             print(f"\n --> Chaîne améliorante de coût minimal trouvée : {chemin_str}")
 
-        flot_augmentable = min(residuel[u][v] for u, v in chemin) # O(n)
-        flot_envoye = min(flot_augmentable, val_flot - flot_total) # O(n)
-        cout_chaine = sum(couts_residuel[u][v] for u, v in chemin) # O(n)
+        #calcul du flot qu’on peut envoyer dans le chemin trouvé
+        flot_augmentable = min(residuel[u][v] for u, v in chemin)
+        flot_envoye = min(flot_augmentable, val_flot - flot_total)
+        cout_chaine = sum(couts_residuel[u][v] for u, v in chemin)
 
         if afficher:
             print(f" Flot envoyé dans cette chaîne : {flot_envoye}")
             print(f" Coût unitaire de la chaîne : {cout_chaine}")
 
-        for u, v in chemin: # O(n)
+        #mise à jour du graphe résiduel et des coûts
+        for u, v in chemin:
             residuel[u][v] -= flot_envoye
             residuel[v][u] += flot_envoye
-            couts_residuel[v][u] = -couts_residuel[u][v]
+            couts_residuel[v][u] = -couts_residuel[u][v]  #inversion du coût sur l’arête retour
 
         flot_total += flot_envoye
         cout_total += flot_envoye * cout_chaine
@@ -466,7 +517,7 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
         print(f" Flot total envoyé : {flot_total}")
         print(f" Coût total du flot : {cout_total}")
 
-    return flot_total
+    return flot_total  #on retourne le flot réellement envoyé
 
     
 
@@ -476,20 +527,23 @@ def executer_flot_min_cout(capacites, couts, noms, val_flot, afficher=True):
 # ------------------------------#
 
 def generer_graphe_aleatoire(n):
-    capacites = [[0]*n for _ in range(n)]
-    couts = [[0]*n for _ in range(n)]
+    capacites = [[0]*n for _ in range(n)]  #matrice des capacités initialisée à 0
+    couts = [[0]*n for _ in range(n)]      #matrice des coûts initialisée à 0
 
-    nb_valeurs_non_nulles = math.floor((n * n) / 2)
+    nb_valeurs_non_nulles = math.floor((n * n) / 2)  #on veut remplir ~50% des cases
 
-    # Génère E(n²/2) couples (i ≠ j)
+    #on génère tous les couples (i, j) avec i ≠ j (pas de boucle sur soi-même)
     couples = [(i, j) for i in range(n) for j in range(n) if i != j]
+
+    #on sélectionne aléatoirement nb_valeurs_non_nulles arêtes parmi tous les couples possibles
     selection = random.sample(couples, nb_valeurs_non_nulles)
 
     for i, j in selection:
-        capacites[i][j] = random.randint(1, 100)
-        couts[i][j] = random.randint(1, 100)
+        capacites[i][j] = random.randint(1, 100)  #on donne une capacité aléatoire entre 1 et 100
+        couts[i][j] = random.randint(1, 100)      #on donne un coût aléatoire entre 1 et 100
 
-    return capacites, couts
+    return capacites, couts  #on retourne les deux matrices générées
+
 
 
 
